@@ -21,17 +21,43 @@
 
     @stack('head')
 
+    {{-- Style tambahan untuk dropdown dan logo --}}
     <style>
-        [x-cloak] {
-            display: none !important;
+        [x-cloak] { display: none !important; }
+        .text-shadow-subtle { text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); }
+        .logo-subtitle { font-size: 0.6rem; letter-spacing: 0.05em; transition: font-size 0.3s ease-in-out; }
+        .logo-subtitle.scrolled { font-size: 0.5rem; }
+        @media (min-width: 768px) {
+            .logo-subtitle { font-size: 0.65rem; }
+            .logo-subtitle.scrolled { font-size: 0.55rem; }
         }
+        .dropdown-item { @apply block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100; }
+        .dropdown-item-active { @apply font-semibold bg-gray-50 text-blue-600; }
+        .mobile-nav-link { @apply block rounded-md px-3 py-2 text-base font-medium text-blue-100 hover:bg-blue-700 hover:text-white transition duration-150 ease-in-out; }
+        .mobile-nav-link-active { @apply block rounded-md bg-blue-900 px-3 py-2 text-base font-medium text-white; }
+        .mobile-lang-link { @apply flex items-center rounded-md px-3 py-2 text-sm font-medium text-blue-200 hover:bg-blue-700 hover:text-white transition duration-150 ease-in-out; }
+        .mobile-lang-link-active { @apply flex items-center rounded-md bg-blue-900 px-3 py-2 text-sm font-medium text-white; }
+        .mobile-accordion-item { @apply block w-full pl-8 pr-3 py-2 text-base font-medium text-blue-100 hover:bg-blue-700 hover:text-white transition duration-150 ease-in-out rounded-md; }
+        .mobile-accordion-item-active { @apply bg-blue-900 text-white font-semibold; }
     </style>
 </head>
 
 <body class="font-sans antialiased bg-gray-50 text-gray-800">
 
-    <div x-data="{ mobileMenuOpen: false, scrolled: false }" @scroll.window.passive="scrolled = (window.pageYOffset > 30)">
+    @php
+        // Definisikan array navigasi utama di sini agar bisa diakses di Header & Footer
+        // Ini memperbaiki masalah urutan
+        $navigationItems = [
+            'home' => __('Home'),
+            'services' => __('Services'),
+            'gallery' => __('Gallery'),
+            'reviews' => __('Reviews'),
+            'divespots' => __('Dive Spots'),
+        ];
+    @endphp
 
+    {{-- Wrapper Alpine untuk Header dan Mobile Menu --}}
+    <div x-data="{ mobileMenuOpen: false, scrolled: false }" @scroll.window.passive="scrolled = (window.pageYOffset > 30)">
         <header
             :class="{
                 'bg-gradient-to-r from-blue-900 to-blue-700 shadow-lg text-white': scrolled || mobileMenuOpen,
@@ -39,6 +65,7 @@
             }"
             class="fixed w-full z-50 transition-all duration-300 ease-in-out py-2.5 md:py-3" x-ref="header">
             <nav class="container mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+                {{-- Logo --}}
                 <a href="{{ route('home', ['locale' => app()->getLocale()]) }}"
                     class="flex-shrink-0 transition-all duration-300">
                     <div class="flex flex-col items-start leading-none">
@@ -56,40 +83,62 @@
                     </div>
                 </a>
 
+                {{-- Navigasi Desktop --}}
                 <div class="hidden md:flex flex-grow justify-center items-center space-x-7 lg:space-x-10">
-                    @php
-                        $navLinks = [
-                            'home' => __('Home'),
-                            'services' => __('Services'),
-                            'gallery' => __('Gallery'),
-                            'reviews' => __('Reviews'),
-                            'divespots' => __('Dive Spots'),
-                        ];
-                    @endphp
-                    @foreach ($navLinks as $route => $label)
-                        <a href="{{ route($route, ['locale' => app()->getLocale()]) }}"
-                            class="text-white text-base font-medium pb-1 border-b-2 transition duration-300 ease-in-out hover:text-yellow-300 hover:border-yellow-300 text-shadow-subtle {{ request()->routeIs($route) ? 'border-yellow-400 text-yellow-300' : 'border-transparent' }}">
-                            {{ $label }}
-                        </a>
+                    
+                    @foreach ($navigationItems as $route => $label)
+                        @if ($route === 'services')
+                            {{-- Dropdown Services Desktop --}}
+                            <div x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false" class="relative">
+                                <button
+                                    class="flex items-center text-white text-base font-medium pb-1 border-b-2 transition duration-300 ease-in-out hover:text-yellow-300 hover:border-yellow-300 focus:outline-none text-shadow-subtle {{ request()->routeIs('services') || request()->routeIs('services.category') ? 'border-yellow-400 text-yellow-300' : 'border-transparent' }}">
+                                    <span>{{ $label }}</span>
+                                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                    </svg>
+                                </button>
+                                <div x-show="open" x-transition:enter="transition ease-out duration-100"
+                                    x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
+                                    x-transition:leave="transition ease-in duration-75" x-transition:leave-start="opacity-100 scale-100"
+                                    x-transition:leave-end="opacity-0 scale-95"
+                                    class="absolute left-1/2 transform -translate-x-1/2 mt-1 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-20"
+                                    style="display: none;">
+                                    <div class="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
+                                        <a href="{{ route('services', ['locale' => app()->getLocale()]) }}"
+                                        class="dropdown-item {{ request()->routeIs('services') && !request()->route('categorySlug') ? 'dropdown-item-active' : '' }}"
+                                        role="menuitem">{{ __('All Services') }}</a>
+                                        {{-- Loop Kategori dari View Composer --}}
+                                        @isset($serviceCategoriesForNav)
+                                            @foreach($serviceCategoriesForNav as $category)
+                                                <a href="{{ route('services.category', ['locale' => app()->getLocale(), 'categorySlug' => $category->slug]) }}"
+                                                class="dropdown-item {{ request()->route('categorySlug') == $category->slug ? 'dropdown-item-active' : '' }}"
+                                                role="menuitem">{{ $category->name }}</a>
+                                            @endforeach
+                                        @endisset
+                                    </div>
+                                </div>
+                            </div>
+                        @else
+                            {{-- Link Navigasi Biasa --}}
+                            <a href="{{ route($route, ['locale' => app()->getLocale()]) }}"
+                                class="text-white text-base font-medium pb-1 border-b-2 transition duration-300 ease-in-out hover:text-yellow-300 hover:border-yellow-300 text-shadow-subtle {{ request()->routeIs($route) ? 'border-yellow-400 text-yellow-300' : 'border-transparent' }}">
+                                {{ $label }}
+                            </a>
+                        @endif
                     @endforeach
                 </div>
 
+                {{-- Language Switcher & Contact Button Desktop --}}
                 <div class="hidden md:flex items-center space-x-4">
+                    {{-- Language Switcher --}}
                     <div x-data="{ langOpen: false }" class="relative">
                         <button @click="langOpen = !langOpen"
                             class="flex items-center text-white hover:text-yellow-300 transition duration-300 focus:outline-none text-shadow-subtle"
                             aria-label="Change language" :aria-expanded="langOpen" aria-haspopup="true"
                             id="lang-switcher-button">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2h1a2 2 0 002-2v-1a2 2 0 012-2h1.945M10 3v1m0 16v1m4-18v1m0 16v1M3 10h1m16 0h1M4 14h1m14 0h1M4 7h1m14 0h1M7 4h1m8 0h1m-9 16h1m8 0h1">
-                                </path>
-                            </svg>
+                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2h1a2 2 0 002-2v-1a2 2 0 012-2h1.945M10 3v1m0 16v1m4-18v1m0 16v1M3 10h1m16 0h1M4 14h1m14 0h1M4 7h1m14 0h1M7 4h1m8 0h1m-9 16h1m8 0h1"></path></svg>
                             <span class="ml-1 text-sm font-medium">{{ strtoupper(app()->getLocale()) }}</span>
-                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M19 9l-7 7-7-7"></path>
-                            </svg>
+                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                         </button>
                         <div x-show="langOpen" @click.away="langOpen = false" x-transition
                             class="absolute right-0 mt-2 w-36 bg-white rounded-md shadow-lg py-1 z-20 text-gray-700"
@@ -109,23 +158,23 @@
                             @endforeach
                         </div>
                     </div>
+                    {{-- Contact Button --}}
                     <a href="{{ route('contact', ['locale' => app()->getLocale()]) }}"
                         class="bg-yellow-400 text-gray-900 px-5 py-1.5 rounded-full font-semibold hover:bg-yellow-500 transition duration-300 ease-in-out shadow hover:shadow-md text-sm">{{ __('Contact Us') }}</a>
                 </div>
 
+                {{-- Mobile Menu Button --}}
                 <div class="md:hidden flex items-center">
                     <button @click.stop="mobileMenuOpen = !mobileMenuOpen"
                         class="p-1 text-white focus:outline-none" aria-label="Open main menu"
                         :aria-expanded="mobileMenuOpen">
-                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M4 6h16M4 12h16m-7 6h7"></path>
-                        </svg>
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
                     </button>
                 </div>
             </nav>
         </header>
 
+        {{-- Mobile Menu Panel --}}
         <div x-show="mobileMenuOpen" x-cloak @click.away="mobileMenuOpen = false"
             x-transition:enter="transition ease-out duration-300 transform"
             x-transition:enter-start="opacity-0 -translate-x-full" x-transition:enter-end="opacity-100 translate-x-0"
@@ -135,19 +184,43 @@
             style="display: none; z-index: 40 !important;">
             <button @click="mobileMenuOpen = false" class="absolute top-4 right-4 text-white p-1 focus:outline-none"
                 aria-label="Close menu">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
-                    </path>
-                </svg>
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
-            <div class="flex flex-col space-y-2">
-                @foreach ($navLinks as $route => $label)
-                    <a href="{{ route($route, ['locale' => app()->getLocale()]) }}"
-                        class="{{ request()->routeIs($route) ? 'mobile-nav-link-active' : 'mobile-nav-link' }}">
-                        {{ $label }}
-                    </a>
+            <div class="flex flex-col space-y-1">
+                 
+                @foreach ($navigationItems as $route => $label)
+                    @if ($route === 'services')
+                        {{-- Accordion Services Mobile --}}
+                        <div x-data="{ open: {{ request()->routeIs('services') || request()->routeIs('services.category') ? 'true' : 'false' }} }">
+                            <button @click="open = !open" class="flex items-center justify-between w-full mobile-nav-link">
+                                <span>{{ $label }}</span>
+                                <svg class="w-5 h-5 transform transition-transform duration-300" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </button>
+                            <div x-show="open" class="mt-1 space-y-1" style="display: none;">
+                                <a href="{{ route('services', ['locale' => app()->getLocale()]) }}"
+                                    class="mobile-accordion-item {{ request()->routeIs('services') && !request()->route('categorySlug') ? 'mobile-accordion-item-active' : '' }}">
+                                    {{ __('All Services') }}
+                                </a>
+                                @isset($serviceCategoriesForNav)
+                                    @foreach($serviceCategoriesForNav as $category)
+                                        <a href="{{ route('services.category', ['locale' => app()->getLocale(), 'categorySlug' => $category->slug]) }}"
+                                        class="mobile-accordion-item {{ request()->route('categorySlug') == $category->slug ? 'mobile-accordion-item-active' : '' }}">
+                                            {{ $category->name }}
+                                        </a>
+                                    @endforeach
+                                @endisset
+                            </div>
+                        </div>
+                    @else
+                        {{-- Link Mobile Biasa --}}
+                        <a href="{{ route($route, ['locale' => app()->getLocale()]) }}"
+                            class="{{ request()->routeIs($route) ? 'mobile-nav-link-active' : 'mobile-nav-link' }}">
+                            {{ $label }}
+                        </a>
+                    @endif
                 @endforeach
 
+                {{-- Language Switcher Mobile --}}
                 <div class="border-t border-blue-700/50 pt-5 mt-5">
                     <h3 class="px-3 text-sm font-medium text-blue-300 uppercase tracking-wider mb-3">
                         {{ __('Language') }}</h3>
@@ -168,128 +241,98 @@
                     </div>
                 </div>
 
+                {{-- Contact Button Mobile --}}
                 <a href="{{ route('contact', ['locale' => app()->getLocale()]) }}"
                     class="bg-yellow-400 text-gray-900 px-6 py-2.5 rounded-full font-semibold hover:bg-yellow-500 transition duration-300 ease-in-out mt-8 text-center text-base shadow-md">{{ __('Contact Us') }}</a>
             </div>
         </div>
+    </div>
+    {{-- Akhir Wrapper Alpine Header --}}
 
-        <main class="flex-grow pt-16">
-            {{ $slot }}
-        </main>
 
-        <div class="relative bg-gradient-to-t from-blue-900 to-blue-800 text-gray-300">
-            <div class="absolute top-0 left-0 w-full overflow-hidden leading-none">
-                <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120"
-                    preserveAspectRatio="none"
-                    class="relative block w-[calc(100%+1.3px)] h-[60px] md:h-[80px] text-gray-50">
-                    <path
-                        d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z"
-                        class="fill-current"></path>
-                </svg>
-            </div>
-            <footer class="pt-20 md:pt-24 pb-8">
-                <div class="container mx-auto px-6 lg:px-8">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
-                        <div
-                            class="sm:col-span-2 lg:col-span-1 flex flex-col items-center sm:items-start text-center sm:text-left">
-                            <a href="{{ route('home', ['locale' => app()->getLocale()]) }}" class="mb-4"><img
-                                    src="{{ asset('images/logo.png') }}" alt="Rumah Selam Logo"
-                                    class="h-20 w-auto" width="80" height="80"></a>
-                            <p class="text-sm text-gray-400 leading-relaxed">
-                                {{ __('Your premier destination for muck diving in the Lembeh Strait. Experience the best of underwater biodiversity with us.') }}
-                            </p>
-                        </div>
-                        <div>
-                            <p class="text-base font-semibold mb-4 tracking-wider uppercase text-gray-100">
-                                {{ __('Navigate') }}</p>
-                            <ul class="space-y-2.5 text-sm">
-                                <li><a href="{{ route('home', ['locale' => app()->getLocale()]) }}"
-                                        class="text-gray-300 hover:text-yellow-400 transition">{{ __('Home') }}</a>
-                                </li>
-                                <li><a href="{{ route('services', ['locale' => app()->getLocale()]) }}"
-                                        class="text-gray-300 hover:text-yellow-400 transition">{{ __('Services') }}</a>
-                                </li>
-                                <li><a href="{{ route('gallery', ['locale' => app()->getLocale()]) }}"
-                                        class="text-gray-300 hover:text-yellow-400 transition">{{ __('Gallery') }}</a>
-                                </li>
-                                <li><a href="{{ route('reviews', ['locale' => app()->getLocale()]) }}"
-                                        class="text-gray-300 hover:text-yellow-400 transition">{{ __('Reviews') }}</a>
-                                </li>
-                                <li><a href="{{ route('divespots', ['locale' => app()->getLocale()]) }}"
-                                        class="text-gray-300 hover:text-yellow-400 transition">{{ __('Dive Spots') }}</a>
-                                </li>
-                                <li><a href="{{ route('contact', ['locale' => app()->getLocale()]) }}"
-                                        class="text-gray-300 hover:text-yellow-400 transition">{{ __('Contact') }}</a>
-                                </li>
-                            </ul>
-                        </div>
-                        <div>
-                            <p class="text-base font-semibold mb-4 tracking-wider uppercase text-gray-100">
-                                {{ __('Contact') }}</p>
-                            <ul class="space-y-2.5 text-sm text-gray-300">
-                                <li class="flex items-start"><svg class="w-4 h-4 mr-2 mt-1 text-gray-500 flex-shrink-0"
-                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0zM15 11a3 3 0 11-6 0 3 3 0 016 0z">
-                                        </path>
-                                    </svg> <span>Pintu Kota Kecil, Lembeh Sel., Kota Bitung, Sulawesi Utara</span>
-                                </li>
-                                <li class="flex items-center"><svg class="w-4 h-4 mr-2 text-gray-500 flex-shrink-0"
-                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z">
-                                        </path>
-                                    </svg> <a href="tel:+6281238455307"
-                                        class="hover:text-yellow-400 transition">+62 812-3845-5307</a></li>
-                                <li class="flex items-center"><svg class="w-4 h-4 mr-2 text-gray-500 flex-shrink-0"
-                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
-                                        </path>
-                                    </svg> <a href="mailto:Rumahselamindo@gmail.com"
-                                        class="hover:text-yellow-400 transition">Rumahselamindo@gmail.com</a></li>
-                            </ul>
-                        </div>
-                        <div>
-                            <p class="text-base font-semibold mb-4 tracking-wider uppercase text-gray-100">
-                                {{ __('Follow Us') }}</p>
-                            <div class="flex space-x-5">
-                                <a href="https://www.facebook.com/rumahselam.lembeh" target="_blank"
-                                    class="text-gray-400 hover:text-blue-500 transition duration-300"
-                                    aria-label="Follow us on Facebook">
-                                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                                        <path
-                                            d="M14 13.5h2.5l1-4H14v-2c0-1.5 0-2 2-2h2V2h-4c-4 0-5 3-5 5v2H7.5v4H10v7h4v-7z" />
-                                    </svg>
-                                </a>
-                                <a href="https://www.instagram.com/rumahselamdc" target="_blank"
-                                    class="text-gray-400 hover:text-pink-500 transition duration-300"
-                                    aria-label="Follow us on Instagram">
-                                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                                        <path fill-rule="evenodd"
-                                            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm4.5-11.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5-1.5-.67-1.5-1.5.67-1.5 1.5-1.5zm-5 1.5c-1.93 0-3.5 1.57-3.5 3.5s1.57 3.5 3.5 3.5 3.5-1.57 3.5-3.5-1.57-3.5-3.5-3.5zm0 5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"
-                                            clip-rule="evenodd" />
-                                    </svg>
-                                </a>
-                            </div>
+    {{-- Konten Halaman Utama --}}
+    {{-- PERBAIKAN: Menambahkan 'pt-20' untuk memberi jarak dari header --}}
+    <main class="flex-grow pt-20">
+        {{ $slot }}
+    </main>
+
+    {{-- Footer --}}
+    <div class="relative bg-gradient-to-t from-blue-900 to-blue-800 text-gray-300">
+        {{-- SVG Wave Separator --}}
+        <div class="absolute top-0 left-0 w-full overflow-hidden leading-none">
+            <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120"
+                preserveAspectRatio="none"
+                class="relative block w-[calc(100%+1.3px)] h-[60px] md:h-[80px] text-gray-50">
+                <path
+                    d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z"
+                    class="fill-current"></path>
+            </svg>
+        </div>
+        <footer class="pt-20 md:pt-24 pb-8">
+            <div class="container mx-auto px-6 lg:px-8">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
+                    {{-- Footer Content: Kolom 1 (Logo & Deskripsi) --}}
+                    <div class="sm:col-span-2 lg:col-span-1 flex flex-col items-center sm:items-start text-center sm:text-left">
+                        <a href="{{ route('home', ['locale' => app()->getLocale()]) }}" class="mb-4"><img
+                                src="{{ asset('images/logo.png') }}" alt="Rumah Selam Logo"
+                                class="h-20 w-auto" width="80" height="80"></a>
+                        <p class="text-sm text-gray-400 leading-relaxed">
+                            {{ __('Your premier destination for muck diving in the Lembeh Strait. Experience the best of underwater biodiversity with us.') }}
+                        </p>
+                    </div>
+                     {{-- Footer Content: Kolom 2 (Navigasi) --}}
+                    <div>
+                        <p class="text-base font-semibold mb-4 tracking-wider uppercase text-gray-100">
+                            {{ __('Navigate') }}</p>
+                        <ul class="space-y-2.5 text-sm">
+                            {{-- PERBAIKAN: Loop menggunakan $navigationItems --}}
+                            @foreach ($navigationItems as $route => $label)
+                             <li><a href="{{ route($route, ['locale' => app()->getLocale()]) }}" class="text-gray-300 hover:text-yellow-400 transition">{{ $label }}</a></li>
+                            @endforeach
+                            {{-- Link Contact --}}
+                            <li><a href="{{ route('contact', ['locale' => app()->getLocale()]) }}" class="text-gray-300 hover:text-yellow-400 transition">{{ __('Contact') }}</a></li>
+                        </ul>
+                    </div>
+                     {{-- Footer Content: Kolom 3 (Kontak) --}}
+                    <div>
+                        <p class="text-base font-semibold mb-4 tracking-wider uppercase text-gray-100">
+                            {{ __('Contact') }}</p>
+                        <ul class="space-y-2.5 text-sm text-gray-300">
+                            <li class="flex items-start"><svg class="w-4 h-4 mr-2 mt-1 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0zM15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> <span>Pintu Kota Kecil, Lembeh Sel., Kota Bitung, Sulawesi Utara</span></li>
+                            <li class="flex items-center"><svg class="w-4 h-4 mr-2 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg> <a href="tel:+6281238455307" class="hover:text-yellow-400 transition">+62 812-3845-5307</a></li>
+                            <li class="flex items-center"><svg class="w-4 h-4 mr-2 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg> <a href="mailto:Rumahselamindo@gmail.com" class="hover:text-yellow-400 transition">Rumahselamindo@gmail.com</a></li>
+                        </ul>
+                    </div>
+                     {{-- Footer Content: Kolom 4 (Sosial Media) --}}
+                    <div>
+                        <p class="text-base font-semibold mb-4 tracking-wider uppercase text-gray-100">
+                            {{ __('Follow Us') }}</p>
+                        <div class="flex space-x-5">
+                            <a href="https://www.facebook.com/rumahselam.lembeh" target="_blank" class="text-gray-400 hover:text-blue-500 transition duration-300" aria-label="Follow us on Facebook">
+                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M14 13.5h2.5l1-4H14v-2c0-1.5 0-2 2-2h2V2h-4c-4 0-5 3-5 5v2H7.5v4H10v7h4v-7z" /></svg>
+                            </a>
+                            <a href="https://www.instagram.com/rumahselamdc" target="_blank" class="text-gray-400 hover:text-pink-500 transition duration-300" aria-label="Follow us on Instagram">
+                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm4.5-11.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5-1.5-.67-1.5-1.5.67-1.5 1.5-1.5zm-5 1.5c-1.93 0-3.5 1.57-3.5 3.5s1.57 3.5 3.5 3.5 3.5-1.57 3.5-3.5-1.57-3.5-3.5-3.5zm0 5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z" clip-rule="evenodd" /></svg>
+                            </a>
                         </div>
                     </div>
-                    <div class="mt-10 border-t border-gray-700/50 pt-6 text-center text-gray-500 text-sm">&copy;
-                        {{ date('Y') }} Rumah Selam Lembeh Dive Center. All Rights Reserved.</div>
                 </div>
-            </footer>
-        </div>
+                {{-- Copyright --}}
+                <div class="mt-10 border-t border-gray-700/50 pt-6 text-center text-gray-500 text-sm">&copy;
+                    {{ date('Y') }} Rumah Selam Lembeh Dive Center. All Rights Reserved.</div>
+            </div>
+        </footer>
+    </div>
 
+    {{-- Tombol Scroll-to-Top --}}
+    <div x-data="{ scrolled: false }" @scroll.window.passive="scrolled = (window.pageYOffset > 100)">
         <button x-show="scrolled" @click="window.scrollTo({ top: 0, behavior: 'smooth' })" x-transition
             class="fixed bottom-6 right-6 bg-yellow-400 hover:bg-yellow-500 text-gray-800 p-2.5 rounded-full shadow-lg z-50 focus:outline-none focus:ring-2 focus:ring-yellow-600 focus:ring-offset-2 focus:ring-offset-gray-900"
             style="display: none;" aria-label="Scroll back to top">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
-            </svg>
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
         </button>
-
     </div>
+
     @stack('scripts')
 </body>
-
 </html>

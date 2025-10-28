@@ -4,24 +4,35 @@
 
 namespace App\Http\Controllers;
 
-// Hapus use model yang tidak perlu jika ada (GalleryCategory, Review, Service, ServiceCategory)
+use App\Models\ServiceCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage; // Pastikan ini ada
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Route;
 
 class PageController extends Controller
 {
     /**
      * Mengambil daftar gambar hero dari folder public.
+     * Mengembalikan URL absolut menggunakan asset().
      */
     private function getHeroImages(): array
     {
         $heroImages = [];
-        $heroPath = public_path('images/hero');
+        $heroPath = public_path('images/hero'); // Path fisik ke direktori
+        $relativePath = 'images/hero'; // Path relatif dari public/
+
         if (File::isDirectory($heroPath)) {
             $files = File::files($heroPath);
             foreach ($files as $file) {
-                $heroImages[] = 'images/hero/' . $file->getFilename();
+                // Gunakan asset() untuk membuat URL yang benar
+                $heroImages[] = asset($relativePath . '/' . $file->getFilename());
             }
+        }
+        // Fallback jika tidak ada gambar
+        if (empty($heroImages)) {
+            $heroImages[] = 'https://placehold.co/1600x900/003366/FFFFFF?text=Rumah+Selam+Lembeh';
         }
         return $heroImages;
     }
@@ -31,7 +42,6 @@ class PageController extends Controller
      */
     public function home()
     {
-        // Kode ini tetap sama
         $featuredServices = \App\Models\Service::with('serviceCategory')->latest()->take(5)->get();
         $latestReviews = \App\Models\Review::where('is_visible', true)->orderBy('created_at', 'desc')->take(5)->get();
         $heroImages = $this->getHeroImages();
@@ -39,14 +49,36 @@ class PageController extends Controller
     }
 
     /**
-     * Menampilkan halaman Services.
+     * Menampilkan halaman Services (Semua Kategori).
      */
     public function services()
     {
-        // Kode ini tetap sama
-        $serviceCategories = \App\Models\ServiceCategory::with('services')->orderBy('name', 'asc')->get();
+        $serviceCategories = ServiceCategory::with('services')->orderBy('name->en', 'asc')->get();
         $heroImages = $this->getHeroImages();
-        return view('pages.services', compact('serviceCategories', 'heroImages'));
+        // Kirim null sebagai selectedCategory
+        return view('pages.services', compact('serviceCategories', 'heroImages'))->with('selectedCategory', null);
+    }
+
+    /**
+     * Method BARU: Menampilkan halaman Services untuk kategori tertentu.
+     */
+    public function servicesByCategory(Request $request)
+    {
+        $categorySlug = $request->route('categorySlug');
+        $trimmedSlug = trim($categorySlug ?? '');
+
+        if (empty($trimmedSlug)) {
+            abort(404);
+        }
+
+        // Cari kategori berdasarkan slug
+        $serviceCategory = ServiceCategory::where('slug', $trimmedSlug)->firstOrFail();
+
+        // Eager load services
+        $serviceCategory->load('services');
+        $heroImages = $this->getHeroImages();
+        // Kirim objek kategori yang ditemukan sebagai selectedCategory
+        return view('pages.services', compact('heroImages'))->with('selectedCategory', $serviceCategory);
     }
 
     /**
@@ -54,8 +86,7 @@ class PageController extends Controller
      */
     public function gallery()
     {
-        // Kode ini tetap sama
-        $galleryCategories = \App\Models\GalleryCategory::with('galleries')->orderBy('name', 'asc')->get();
+        $galleryCategories = \App\Models\GalleryCategory::with('galleries')->orderBy('name->en', 'asc')->get();
         $heroImages = $this->getHeroImages();
         return view('pages.gallery', compact('galleryCategories', 'heroImages'));
     }
@@ -65,9 +96,8 @@ class PageController extends Controller
      */
     public function diveSpots()
     {
-         // !! PERUBAHAN: Hanya kirim heroImages !!
          $heroImages = $this->getHeroImages();
-         return view('pages.divespots', compact('heroImages')); // Tidak perlu $diveSpots lagi
+         return view('pages.divespots', compact('heroImages'));
     }
 
     /**
@@ -75,7 +105,6 @@ class PageController extends Controller
      */
     public function reviews()
     {
-        // Kode ini tetap sama
         $reviews = \App\Models\Review::where('is_visible', true)->orderBy('created_at', 'desc')->paginate(10);
         $heroImages = $this->getHeroImages();
         return view('pages.reviews', compact('reviews', 'heroImages'));
@@ -86,7 +115,6 @@ class PageController extends Controller
      */
     public function contact()
     {
-         // Kode ini tetap sama
          $heroImages = $this->getHeroImages();
          return view('pages.contact', compact('heroImages'));
     }
@@ -96,7 +124,6 @@ class PageController extends Controller
      */
     public function submitContact(Request $request)
     {
-        // Kode ini tetap sama
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
@@ -105,11 +132,16 @@ class PageController extends Controller
         ]);
 
         try {
+            // Logika pengiriman email (contoh)
+            // Mail::to('admin@example.com')->send(new ContactFormMail($validated));
+
             return redirect()->route('contact', ['locale' => app()->getLocale()])
                              ->with('success', __('contact.form.success'));
         } catch (\Exception $e) {
+             // Log::error($e->getMessage());
              return redirect()->route('contact', ['locale' => app()->getLocale()])
                              ->with('error', __('contact.form.error'));
         }
     }
 }
+
