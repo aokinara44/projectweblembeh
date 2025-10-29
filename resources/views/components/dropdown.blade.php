@@ -1,3 +1,20 @@
+{{-- 
+    Daftar kelas untuk Tailwind JIT Compiler:
+    Kelas-kelas ini dibuat secara dinamis oleh blok @php di bawah.
+    Menambahkan mereka di sini memastikan Tailwind tidak menghapusnya (purge).
+
+    Untuk $width:
+    w-48
+
+    Untuk $alignmentClasses:
+    ltr:origin-top-left rtl:origin-top-right start-0
+    origin-top
+    ltr:origin-top-right rtl:origin-top-left end-0
+
+    Untuk $contentClasses (default):
+    py-1 bg-white
+--}}
+
 @props(['align' => 'right', 'width' => '48', 'contentClasses' => 'py-1 bg-white'])
 
 @php

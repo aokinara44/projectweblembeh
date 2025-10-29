@@ -1,8 +1,13 @@
+{{-- Lokasi File: resources/views/welcome.blade.php --}}
 <x-main-layout>
 
+    {{-- 
+      PERBAIKAN: Menghapus 'asset()' dari $heroImages[0]. 
+      Variabel ini sudah berisi URL lengkap dari PageController.
+    --}}
     @if(isset($heroImages) && !empty($heroImages[0]))
         @push('head')
-            <link rel="preload" as="image" href="{{ asset($heroImages[0]) }}" fetchpriority="high">
+            <link rel="preload" as="image" href="{{ $heroImages[0] }}" fetchpriority="high">
         @endpush
     @endif
 
@@ -17,17 +22,19 @@
         </style>
     @endpush
 
-    {{-- !! PERUBAHAN DI SINI: Tambahkan absolute inset-x-0 top-0 !! --}}
     <section
         x-data="{ images: {{ json_encode($heroImages ?? []) }}, current: 0, next() { this.current = (this.current + 1) % this.images.length; }, init() { if (this.images.length > 1) { setInterval(() => { this.next() }, 5000); } } }"
         x-init="init()"
-        {{-- Tambahkan class positioning absolut --}}
         class="absolute inset-x-0 top-0 h-[75vh] md:h-[80vh] bg-cover bg-center text-white flex items-center justify-center overflow-hidden"
     >
         <template x-for="(image, index) in images" :key="index">
             <div
                 class="absolute inset-0 bg-cover bg-center"
-                :style="'background-image: url(\'' + '{{ asset('') }}' + image + '\');'"
+                {{-- 
+                  PERBAIKAN: Menghapus '{{ asset('') }}' + 
+                  Variabel 'image' sudah berisi URL lengkap dari PageController.
+                --}}
+                :style="'background-image: url(\'' + image + '\');'"
                 x-show="current === index"
                 x-transition:enter="transition-opacity ease-in-out duration-1000"
                 x-transition:enter-start="opacity-0"
@@ -39,17 +46,14 @@
         </template>
         <div x-show="images.length === 0" class="absolute inset-0 bg-gray-600" style="background-image: url('https://source.unsplash.com/1600x900/?scuba-diving,coral-reef');"></div>
         <div class="absolute inset-0 bg-black opacity-40"></div>
-        {{-- Konten tetap relative z-10 agar di atas overlay --}}
+        
         <div class="relative z-10 text-center px-4 fade-in">
             <h1 class="text-4xl md:text-6xl font-bold leading-tight mb-4" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">{{ __('hero.title') }}</h1>
             <p class="text-base md:text-xl max-w-3xl mx-auto mb-8" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">{{ __('hero.description') }}</p>
             <a href="https://wa.me/6281238455307?text=Hello%2C%20I%20would%20like%20to%20ask%20about%20availability%20and%20prices%20for%20diving." target="_blank" rel="noopener noreferrer" class="bg-yellow-400 hover:bg-yellow-500 text-gray-800 font-bold py-3 px-8 rounded-lg shadow-lg transition-transform transform hover:scale-105 text-base md:text-lg inline-block mb-12">{{ __('hero.button') }}</a>
         </div>
     </section>
-    {{-- !! AKHIR PERUBAHAN HERO SECTION !! --}}
 
-    {{-- !! PERUBAHAN DI SINI: Tambahkan margin-top SEBESAR tinggi hero section !! --}}
-    {{-- Tinggi hero: h-[75vh] md:h-[80vh]. Jadi mt-[75vh] md:mt-[80vh] --}}
     <div class="mt-[75vh] md:mt-[80vh]">
         <section class="py-16 bg-white">
             <div class="container mx-auto px-6 text-center">
@@ -101,7 +105,13 @@
                                             </p>
                                         </div>
                                         <div class="p-6 pt-0">
-                                            <a href="{{ route('services', ['locale' => app()->getLocale()]) }}" class="font-semibold text-yellow-500 hover:text-yellow-600">{{ __('Learn More') }} &rarr;</a>
+                                            {{-- 
+                                              PERBAIKAN: Link kini mengarah ke 'services.category' jika kategori ada. 
+                                              Jika tidak, kembali ke 'services' (fallback).
+                                            --}}
+                                            <a href="{{ $service->serviceCategory ? route('services.category', ['locale' => app()->getLocale(), 'categorySlug' => $service->serviceCategory->slug]) : route('services', ['locale' => app()->getLocale()]) }}" 
+                                               class="font-semibold text-yellow-500 hover:text-yellow-600">{{ __('Learn More') }} &rarr;
+                                            </a>
                                         </div>
                                     </div>
                                 </div>

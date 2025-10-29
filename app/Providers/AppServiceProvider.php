@@ -27,7 +27,10 @@ class AppServiceProvider extends ServiceProvider
         View::composer('layouts.main', function ($view) {
             // Mengambil semua kategori layanan, diurutkan berdasarkan nama (terjemahan bahasa Inggris)
             // Hanya ambil ID, Name, dan Slug untuk efisiensi
-            $serviceCategoriesForNav = ServiceCategory::orderBy('name->en', 'asc')->select('id', 'name', 'slug')->get();
+            $serviceCategoriesForNav = ServiceCategory::orderBy('name->en', 'asc')
+                                        ->select('id', 'name', 'slug')
+                                        ->get();
+            
             // Mengirim data ke view dengan nama variabel 'serviceCategoriesForNav'
             $view->with('serviceCategoriesForNav', $serviceCategoriesForNav);
         });

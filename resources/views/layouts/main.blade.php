@@ -21,25 +21,8 @@
 
     @stack('head')
 
-    {{-- Style tambahan untuk dropdown dan logo --}}
-    <style>
-        [x-cloak] { display: none !important; }
-        .text-shadow-subtle { text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); }
-        .logo-subtitle { font-size: 0.6rem; letter-spacing: 0.05em; transition: font-size 0.3s ease-in-out; }
-        .logo-subtitle.scrolled { font-size: 0.5rem; }
-        @media (min-width: 768px) {
-            .logo-subtitle { font-size: 0.65rem; }
-            .logo-subtitle.scrolled { font-size: 0.55rem; }
-        }
-        .dropdown-item { @apply block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100; }
-        .dropdown-item-active { @apply font-semibold bg-gray-50 text-blue-600; }
-        .mobile-nav-link { @apply block rounded-md px-3 py-2 text-base font-medium text-blue-100 hover:bg-blue-700 hover:text-white transition duration-150 ease-in-out; }
-        .mobile-nav-link-active { @apply block rounded-md bg-blue-900 px-3 py-2 text-base font-medium text-white; }
-        .mobile-lang-link { @apply flex items-center rounded-md px-3 py-2 text-sm font-medium text-blue-200 hover:bg-blue-700 hover:text-white transition duration-150 ease-in-out; }
-        .mobile-lang-link-active { @apply flex items-center rounded-md bg-blue-900 px-3 py-2 text-sm font-medium text-white; }
-        .mobile-accordion-item { @apply block w-full pl-8 pr-3 py-2 text-base font-medium text-blue-100 hover:bg-blue-700 hover:text-white transition duration-150 ease-in-out rounded-md; }
-        .mobile-accordion-item-active { @apply bg-blue-900 text-white font-semibold; }
-    </style>
+    {{-- !! BLOK STYLE SUDAH DIHAPUS & DIPINDAH KE app.css !! --}}
+    
 </head>
 
 <body class="font-sans antialiased bg-gray-50 text-gray-800">
@@ -101,12 +84,12 @@
                                     x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
                                     x-transition:leave="transition ease-in duration-75" x-transition:leave-start="opacity-100 scale-100"
                                     x-transition:leave-end="opacity-0 scale-95"
-                                    class="absolute left-1/2 transform -translate-x-1/2 mt-1 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-20"
+                                    class="absolute left-1/2 transform -translate-x-1/2 mt-1 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-20 text-gray-700"
                                     style="display: none;">
                                     <div class="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
-                                        <a href="{{ route('services', ['locale' => app()->getLocale()]) }}"
-                                        class="dropdown-item {{ request()->routeIs('services') && !request()->route('categorySlug') ? 'dropdown-item-active' : '' }}"
-                                        role="menuitem">{{ __('All Services') }}</a>
+                                        
+                                        {{-- !! TAUTAN 'ALL SERVICES' SUDAH DIHAPUS !! --}}
+
                                         {{-- Loop Kategori dari View Composer --}}
                                         @isset($serviceCategoriesForNav)
                                             @foreach($serviceCategoriesForNav as $category)
@@ -197,10 +180,9 @@
                                 <svg class="w-5 h-5 transform transition-transform duration-300" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                             </button>
                             <div x-show="open" class="mt-1 space-y-1" style="display: none;">
-                                <a href="{{ route('services', ['locale' => app()->getLocale()]) }}"
-                                    class="mobile-accordion-item {{ request()->routeIs('services') && !request()->route('categorySlug') ? 'mobile-accordion-item-active' : '' }}">
-                                    {{ __('All Services') }}
-                                </a>
+                                
+                                {{-- !! TAUTAN 'ALL SERVICES' SUDAH DIHAPUS !! --}}
+
                                 @isset($serviceCategoriesForNav)
                                     @foreach($serviceCategoriesForNav as $category)
                                         <a href="{{ route('services.category', ['locale' => app()->getLocale(), 'categorySlug' => $category->slug]) }}"

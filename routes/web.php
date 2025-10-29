@@ -48,19 +48,19 @@ Route::get('/sitemap.xml', [SitemapController::class, 'generate'])->name('sitema
 */
 Route::prefix('{locale}')
     ->where(['locale' => '[a-zA-Z]{2}'])
-    // !! HAPUS MIDDLEWARE DARI GRUP !!
-    // ->middleware(SetLocale::class)
+    ->middleware(SetLocale::class) // Middleware diterapkan di sini untuk seluruh grup
     ->group(function () {
-        // !! TAMBAHKAN MIDDLEWARE KE SETIAP RUTE DI DALAM GRUP !!
-        Route::get('/', [PageController::class, 'home'])->middleware(SetLocale::class)->name('home');
-        Route::get('/services', [PageController::class, 'services'])->middleware(SetLocale::class)->name('services');
-        Route::get('/services/{categorySlug}', [PageController::class, 'servicesByCategory'])->middleware(SetLocale::class)->name('services.category');
-        Route::get('/gallery', [PageController::class, 'gallery'])->middleware(SetLocale::class)->name('gallery');
-        Route::get('/reviews', [PageController::class, 'reviews'])->middleware(SetLocale::class)->name('reviews');
-        Route::get('/divespots', [PageController::class, 'diveSpots'])->middleware(SetLocale::class)->name('divespots');
-        Route::get('/contact', [PageController::class, 'contact'])->middleware(SetLocale::class)->name('contact');
-        Route::post('/contact', [PageController::class, 'submitContact'])->middleware(SetLocale::class)->name('contact.submit');
-        // !! AKHIR PENAMBAHAN MIDDLEWARE !!
+        
+        Route::get('/', [PageController::class, 'home'])->name('home');
+        Route::get('/services', [PageController::class, 'services'])->name('services');
+        Route::get('/services/{categorySlug}', [PageController::class, 'servicesByCategory'])->name('services.category');
+        Route::get('/gallery', [PageController::class, 'gallery'])->name('gallery');
+        Route::get('/reviews', [PageController::class, 'reviews'])->name('reviews');
+        Route::get('/divespots', [PageController::class, 'diveSpots'])->name('divespots');
+        Route::get('/contact', [PageController::class, 'contact'])->name('contact');
+        Route::post('/contact', [PageController::class, 'submitContact'])->name('contact.submit');
+        
+        // Middleware individual tidak lagi diperlukan di sini
     });
 
 /*
@@ -89,4 +89,3 @@ Route::get('/{path}', function ($path) {
     abort(404);
 
 })->where('path', '^(?!admin|login|logout|register|forgot-password|reset-password|sitemap\.xml|_ignition|storage|build|favicon\.ico).*$');
-

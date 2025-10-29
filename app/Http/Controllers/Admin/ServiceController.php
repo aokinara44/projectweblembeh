@@ -1,5 +1,5 @@
 <?php
-// app/Http/Controllers/Admin/ServiceController.php
+// Lokasi File: app/Http/Controllers/Admin/ServiceController.php
 
 namespace App\Http\Controllers\Admin;
 
@@ -55,9 +55,6 @@ class ServiceController extends Controller
         if ($request->hasFile('featured_image')) {
             $validated['featured_image'] = $request->file('featured_image')->store('services', 'public');
         }
-
-        // !! DEBUG DIHAPUS !!
-        // dd($validated); 
 
         // Simpan data ke database
         Service::create($validated); 
