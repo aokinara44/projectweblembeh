@@ -1,126 +1,164 @@
-@php
-    use Illuminate\Support\Facades\Auth;
+<?php
+// Lokasi File: resources/views/layouts/navigation.blade.php
+?>
+<nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16">
+            <div class="flex">
+                <div class="shrink-0 flex items-center">
+                    <a href="{{ route('admin.dashboard', ['locale' => app()->getLocale()]) }}">
+                        <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
+                    </a>
+                </div>
 
-    $isActive = fn($pattern) => request()->routeIs($pattern);
-    $activeClass = 'bg-gray-900 text-white';
-    $inactiveClass = 'text-gray-300 hover:bg-gray-700 hover:text-white';
+                <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+                    <x-nav-link :href="route('admin.dashboard', ['locale' => app()->getLocale()])" :active="request()->routeIs('admin.dashboard')">
+                        {{ __('Dashboard') }}
+                    </x-nav-link>
 
-    $activeMenu = '';
-    if ($isActive('admin.services.*') || $isActive('admin.service-categories.*')) $activeMenu = 'layanan';
-    if ($isActive('admin.galleries.*') || $isActive('admin.gallery-categories.*')) $activeMenu = 'galeri';
-    // Menu blog sudah dihapus
-@endphp
+                    {{-- Link Layanan --}}
+                    <x-nav-link :href="route('admin.service-categories.index', ['locale' => app()->getLocale()])" :active="request()->routeIs('admin.service-categories.*')">
+                        {{ __('Service Categories') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('admin.services.index', ['locale' => app()->getLocale()])" :active="request()->routeIs('admin.services.*')">
+                        {{ __('Services') }}
+                    </x-nav-link>
 
-<div
-    class="fixed inset-y-0 left-0 z-30 w-64 bg-gray-800 text-white transform transition-all duration-300 ease-in-out sm:relative sm:translate-x-0"
-    :class="{
-        'translate-x-0': mobileSidebarOpen,
-        '-translate-x-full sm:translate-x-0': !mobileSidebarOpen,
-        'sm:w-64': !sidebarCollapsed,
-        'sm:w-20': sidebarCollapsed
-    }"
-    @click.away="mobileSidebarOpen = false"
->
-    <div class="flex items-center justify-center px-4 py-6 overflow-hidden">
-        {{-- INI LINK YANG KITA UBAH --}}
-        <a href="{{ route('admin.dashboard') }}"> {{-- Nama route sudah benar 'admin.dashboard' --}}
-            <span class="text-white text-lg font-bold" :class="{'sm:hidden': sidebarCollapsed}">Rumah Selam Admin</span>
-             <svg x-show="sidebarCollapsed" x-cloak class="w-8 h-8 text-white hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2h1a2 2 0 002-2v-1a2 2 0 012-2h1.945M7.75 4h8.5a2.25 2.25 0 012.25 2.25v1.5a2.25 2.25 0 01-2.25 2.25h-8.5A2.25 2.25 0 015.5 7.75v-1.5A2.25 2.25 0 017.75 4z"></path></svg>
-        </a>
+                     {{-- Link Galeri --}}
+                    <x-nav-link :href="route('admin.gallery-categories.index', ['locale' => app()->getLocale()])" :active="request()->routeIs('admin.gallery-categories.*')">
+                        {{ __('Gallery Categories') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('admin.galleries.index', ['locale' => app()->getLocale()])" :active="request()->routeIs('admin.galleries.*')">
+                        {{ __('Galleries') }}
+                    </x-nav-link>
+
+                    {{-- Link Ulasan --}}
+                    <x-nav-link :href="route('admin.reviews.index', ['locale' => app()->getLocale()])" :active="request()->routeIs('admin.reviews.*')">
+                        {{ __('Reviews') }}
+                    </x-nav-link>
+
+                    {{-- !! TAMBAHKAN LINK NAVIGASI EXPLORE !! --}}
+                    <x-nav-link :href="route('admin.explore-categories.index', ['locale' => app()->getLocale()])" :active="request()->routeIs('admin.explore-categories.*')">
+                        {{ __('Explore Categories') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('admin.explore-posts.index', ['locale' => app()->getLocale()])" :active="request()->routeIs('admin.explore-posts.*')">
+                        {{ __('Explore Posts') }}
+                    </x-nav-link>
+
+                    {{-- Link Pengguna (jika perlu) --}}
+                     <x-nav-link :href="route('admin.users.index', ['locale' => app()->getLocale()])" :active="request()->routeIs('admin.users.*')">
+                        {{ __('Users') }}
+                    </x-nav-link>
+
+                </div>
+            </div>
+
+            <div class="hidden sm:flex sm:items-center sm:ml-6">
+                <x-dropdown align="right" width="48">
+                    <x-slot name="trigger">
+                        <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
+                            <div>{{ Auth::user()->name }}</div>
+
+                            <div class="ml-1">
+                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                        </button>
+                    </x-slot>
+
+                    <x-slot name="content">
+                        <x-dropdown-link :href="route('admin.profile.edit', ['locale' => app()->getLocale()])">
+                            {{ __('Profile') }}
+                        </x-dropdown-link>
+
+                        <form method="POST" action="{{ route('logout', ['locale' => app()->getLocale()]) }}">
+                            @csrf
+
+                            <x-dropdown-link :href="route('logout', ['locale' => app()->getLocale()])"
+                                    onclick="event.preventDefault();
+                                                this.closest('form').submit();">
+                                {{ __('Log Out') }}
+                            </x-dropdown-link>
+                        </form>
+                    </x-slot>
+                </x-dropdown>
+            </div>
+
+            <div class="-mr-2 flex items-center sm:hidden">
+                <button @click="open = ! open" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition duration-150 ease-in-out">
+                    <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+                        <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        <path :class="{'hidden': ! open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+        </div>
     </div>
 
-    <nav
-        x-data="{ openDropdown: '' }"
-        x-init="
-            if (!sidebarCollapsed) openDropdown = '{{ $activeMenu }}';
-            $watch('sidebarCollapsed', collapsed => {
-                openDropdown = collapsed ? '' : '{{ $activeMenu }}';
-            });
-        "
-        class="flex-1 px-4 space-y-1"
-    >
-
-        {{-- INI LINK YANG KITA UBAH --}}
-        <a href="{{ route('admin.dashboard') }}" class="flex items-center space-x-3 px-4 py-2.5 rounded-md transition-colors duration-200 {{ $isActive('admin.dashboard') ? $activeClass : $inactiveClass }}"> {{-- Nama route sudah benar 'admin.dashboard' --}}
-            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
-            <span :class="{'sm:hidden': sidebarCollapsed}">{{ __('Dashboard') }}</span>
-        </a>
-
-        <div class="px-4 pt-4 pb-2">
-            <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider" :class="{'sm:hidden': sidebarCollapsed}">Konten</span>
-            <div x-show="sidebarCollapsed" x-cloak class="border-t border-gray-700 hidden sm:block"></div>
-        </div>
-
-        {{-- Layanan Dropdown --}}
-        <div class="relative" @click.away="if (sidebarCollapsed) openDropdown = ''">
-            <button @click.stop="openDropdown = (openDropdown === 'layanan' ? '' : 'layanan')" class="w-full flex items-center justify-between space-x-3 px-4 py-2.5 rounded-md transition-colors duration-200 {{ $isActive('admin.services.*') || $isActive('admin.service-categories.*') ? 'bg-gray-700' : $inactiveClass }}">
-                <div class="flex items-center space-x-3">
-                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                    <span :class="{'sm:hidden': sidebarCollapsed}">Layanan</span>
-                </div>
-                <svg x-show="!sidebarCollapsed" class="w-4 h-4 transform transition-transform" :class="{ 'rotate-180': openDropdown === 'layanan' }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-            </button>
-            <div x-show="openDropdown === 'layanan'" x-cloak @click.stop="if (sidebarCollapsed) openDropdown = ''" x-transition class="mt-1 space-y-1" :class="{'pl-8': !sidebarCollapsed, 'sm:absolute sm:left-20 sm:w-48 sm:bg-gray-800 sm:rounded-md sm:shadow-lg sm:p-2 sm:z-10': sidebarCollapsed}">
-                <a href="{{ route('admin.services.index') }}" class="block w-full text-left pr-4 py-2 rounded-md transition-colors duration-200 text-sm {{ $isActive('admin.services.*') ? $activeClass : $inactiveClass }}" :class="{'pl-4': !sidebarCollapsed}">Semua Layanan</a>
-                <a href="{{ route('admin.service-categories.index') }}" class="block w-full text-left pr-4 py-2 rounded-md transition-colors duration-200 text-sm {{ $isActive('admin.service-categories.*') ? $activeClass : $inactiveClass }}" :class="{'pl-4': !sidebarCollapsed}">Kategori Layanan</a>
-            </div>
-        </div>
-
-        {{-- Galeri Dropdown --}}
-        <div class="relative" @click.away="if (sidebarCollapsed) openDropdown = ''">
-             <button @click.stop="openDropdown = (openDropdown === 'galeri' ? '' : 'galeri')" class="w-full flex items-center justify-between space-x-3 px-4 py-2.5 rounded-md transition-colors duration-200 {{ $isActive('admin.galleries.*') || $isActive('admin.gallery-categories.*') ? 'bg-gray-700' : $inactiveClass }}">
-                <div class="flex items-center space-x-3">
-                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l-1-1m5 5v-4.5a2.5 2.5 0 00-5 0V16m0 0h-4.5a2.5 2.5 0 000 5H14m0-5a2.5 2.5 0 005 0V11a2.5 2.5 0 00-5 0v2.5z"></path></svg>
-                    <span :class="{'sm:hidden': sidebarCollapsed}">Galeri</span>
-                </div>
-                <svg x-show="!sidebarCollapsed" class="w-4 h-4 transform transition-transform" :class="{ 'rotate-180': openDropdown === 'galeri' }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-            </button>
-            <div x-show="openDropdown === 'galeri'" x-cloak @click.stop="if (sidebarCollapsed) openDropdown = ''" x-transition class="mt-1 space-y-1" :class="{'pl-8': !sidebarCollapsed, 'sm:absolute sm:left-20 sm:w-48 sm:bg-gray-800 sm:rounded-md sm:shadow-lg sm:p-2 sm:z-10': sidebarCollapsed}">
-                <a href="{{ route('admin.galleries.index') }}" class="block w-full text-left pr-4 py-2 rounded-md transition-colors duration-200 text-sm {{ $isActive('admin.galleries.*') ? $activeClass : $inactiveClass }}" :class="{'pl-4': !sidebarCollapsed}">Semua Galeri</a>
-                <a href="{{ route('admin.gallery-categories.index') }}" class="block w-full text-left pr-4 py-2 rounded-md transition-colors duration-200 text-sm {{ $isActive('admin.gallery-categories.*') ? $activeClass : $inactiveClass }}" :class="{'pl-4': !sidebarCollapsed}">Kategori Galeri</a>
-            </div>
-        </div>
-
-        {{-- Blog Dropdown SUDAH DIHAPUS --}}
-
-        <div class="px-4 pt-4 pb-2">
-            <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider" :class="{'sm:hidden': sidebarCollapsed}">Manajemen</span>
-            <div x-show="sidebarCollapsed" x-cloak class="border-t border-gray-700 hidden sm:block"></div>
-        </div>
-
-        {{-- Booking SUDAH DIHAPUS --}}
-
-        <a href="{{ route('admin.reviews.index') }}" class="flex items-center space-x-3 px-4 py-2.5 rounded-md transition-colors duration-200 {{ $isActive('admin.reviews.*') ? $activeClass : $inactiveClass }}">
-            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.196-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118L2.98 9.1c-.783-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg>
-            <span :class="{'sm:hidden': sidebarCollapsed}">Reviews</span>
-        </a>
-        <div class="px-4 pt-4 pb-2">
-            <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider" :class="{'sm:hidden': sidebarCollapsed}">Pengaturan</span>
-            <div x-show="sidebarCollapsed" x-cloak class="border-t border-gray-700 hidden sm:block"></div>
-        </div>
-
-        <a href="{{ route('admin.users.index') }}" class="flex items-center space-x-3 px-4 py-2.5 rounded-md transition-colors duration-200 {{ $isActive('admin.users.*') ? $activeClass : $inactiveClass }}">
-            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M15 21a6 6 0 00-9-5.197m0 0A10.99 10.99 0 002.63 12c0-3.033 1.25-5.78 3.28-7.72 1.94-1.89 4.59-3.03 7.43-3.03 2.84 0 5.49.94 7.43 3.03 2.03 1.94 3.28 4.69 3.28 7.72 0 3.03-1.25 5.78-3.28 7.72-1.94 1.89-4.59 3.03-7.43 3.03-1.39 0-2.73-.28-3.95-.79z"></path></svg>
-            <span :class="{'sm:hidden': sidebarCollapsed}">Users</span>
-        </a>
-    </nav>
-
-    <div class="sm:hidden p-4 border-t border-gray-700">
-        <div class="font-medium text-base text-gray-200">{{ Auth::user()->name }}</div>
-        <div class="font-medium text-sm text-gray-400">{{ Auth::user()->email }}</div>
-        <div class="mt-3 space-y-1">
-            <x-responsive-nav-link :href="route('admin.profile.edit')" class="text-gray-300 hover:text-white"> {{-- Nama route sudah 'admin.profile.edit' --}}
-                {{ __('Profile') }}
+    <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
+        <div class="pt-2 pb-3 space-y-1">
+            <x-responsive-nav-link :href="route('admin.dashboard', ['locale' => app()->getLocale()])" :active="request()->routeIs('admin.dashboard')">
+                {{ __('Dashboard') }}
             </x-responsive-nav-link>
 
-            <form method="POST" action="{{ route('logout') }}">
-                @csrf
-                <x-responsive-nav-link :href="route('logout')"
-                        onclick="event.preventDefault(); this.closest('form').submit();"
-                        class="text-gray-300 hover:text-white">
-                    {{ __('Log Out') }}
+             {{-- Link Layanan (Responsive) --}}
+            <x-responsive-nav-link :href="route('admin.service-categories.index', ['locale' => app()->getLocale()])" :active="request()->routeIs('admin.service-categories.*')">
+                {{ __('Service Categories') }}
+            </x-responsive-nav-link>
+             <x-responsive-nav-link :href="route('admin.services.index', ['locale' => app()->getLocale()])" :active="request()->routeIs('admin.services.*')">
+                {{ __('Services') }}
+            </x-responsive-nav-link>
+
+             {{-- Link Galeri (Responsive) --}}
+            <x-responsive-nav-link :href="route('admin.gallery-categories.index', ['locale' => app()->getLocale()])" :active="request()->routeIs('admin.gallery-categories.*')">
+                {{ __('Gallery Categories') }}
+            </x-responsive-nav-link>
+             <x-responsive-nav-link :href="route('admin.galleries.index', ['locale' => app()->getLocale()])" :active="request()->routeIs('admin.galleries.*')">
+                {{ __('Galleries') }}
+            </x-responsive-nav-link>
+
+             {{-- Link Ulasan (Responsive) --}}
+            <x-responsive-nav-link :href="route('admin.reviews.index', ['locale' => app()->getLocale()])" :active="request()->routeIs('admin.reviews.*')">
+                {{ __('Reviews') }}
+            </x-responsive-nav-link>
+
+            {{-- !! TAMBAHKAN LINK NAVIGASI EXPLORE (Responsive) !! --}}
+            <x-responsive-nav-link :href="route('admin.explore-categories.index', ['locale' => app()->getLocale()])" :active="request()->routeIs('admin.explore-categories.*')">
+                {{ __('Explore Categories') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('admin.explore-posts.index', ['locale' => app()->getLocale()])" :active="request()->routeIs('admin.explore-posts.*')">
+                {{ __('Explore Posts') }}
+            </x-responsive-nav-link>
+
+            {{-- Link Pengguna (Responsive) --}}
+             <x-responsive-nav-link :href="route('admin.users.index', ['locale' => app()->getLocale()])" :active="request()->routeIs('admin.users.*')">
+                {{ __('Users') }}
+            </x-responsive-nav-link>
+
+        </div>
+
+        <div class="pt-4 pb-1 border-t border-gray-200">
+            <div class="px-4">
+                <div class="font-medium text-base text-gray-800">{{ Auth::user()->name }}</div>
+                <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
+            </div>
+
+            <div class="mt-3 space-y-1">
+                <x-responsive-nav-link :href="route('admin.profile.edit', ['locale' => app()->getLocale()])">
+                    {{ __('Profile') }}
                 </x-responsive-nav-link>
-            </form>
+
+                <form method="POST" action="{{ route('logout', ['locale' => app()->getLocale()]) }}">
+                    @csrf
+
+                    <x-responsive-nav-link :href="route('logout', ['locale' => app()->getLocale()])"
+                            onclick="event.preventDefault();
+                                        this.closest('form').submit();">
+                        {{ __('Log Out') }}
+                    </x-responsive-nav-link>
+                </form>
+            </div>
         </div>
     </div>
-</div>
+</nav>

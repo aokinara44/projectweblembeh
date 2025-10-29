@@ -14,6 +14,9 @@ use App\Http\Controllers\Admin\ReviewController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Middleware\SetLocale;
+// !! TAMBAHKAN IMPORT CONTROLLER BARU !!
+use App\Http\Controllers\Admin\ExploreCategoryController;
+use App\Http\Controllers\Admin\ExplorePostController;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,12 +30,20 @@ Route::middleware(SetLocale::class)->group(function () {
 Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () {
     Route::middleware(SetLocale::class)->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+        // CRUD Resources
         Route::resource('service-categories', ServiceCategoryController::class);
         Route::resource('services', ServiceController::class);
         Route::resource('gallery-categories', GalleryCategoryController::class);
         Route::resource('galleries', GalleryController::class);
         Route::resource('reviews', ReviewController::class);
         Route::resource('users', UserController::class);
+
+        // !! TAMBAHKAN ROUTE RESOURCE UNTUK EXPLORE !!
+        Route::resource('explore-categories', ExploreCategoryController::class);
+        Route::resource('explore-posts', ExplorePostController::class);
+
+        // Profile Routes
         Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
         Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
         Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
@@ -48,19 +59,21 @@ Route::get('/sitemap.xml', [SitemapController::class, 'generate'])->name('sitema
 */
 Route::prefix('{locale}')
     ->where(['locale' => '[a-zA-Z]{2}'])
-    ->middleware(SetLocale::class) // Middleware diterapkan di sini untuk seluruh grup
+    ->middleware(SetLocale::class)
     ->group(function () {
-        
+
         Route::get('/', [PageController::class, 'home'])->name('home');
         Route::get('/services', [PageController::class, 'services'])->name('services');
         Route::get('/services/{categorySlug}', [PageController::class, 'servicesByCategory'])->name('services.category');
         Route::get('/gallery', [PageController::class, 'gallery'])->name('gallery');
         Route::get('/reviews', [PageController::class, 'reviews'])->name('reviews');
-        Route::get('/divespots', [PageController::class, 'diveSpots'])->name('divespots');
+        Route::get('/explore', [PageController::class, 'explore'])->name('explore');
+        // !! NANTI KITA BUAT ROUTE INI !!
+        // Route::get('/explore/{categorySlug}', [PageController::class, 'exploreByCategory'])->name('explore.category');
+        // Route::get('/explore/{categorySlug}/{postSlug}', [PageController::class, 'exploreShow'])->name('explore.show');
         Route::get('/contact', [PageController::class, 'contact'])->name('contact');
         Route::post('/contact', [PageController::class, 'submitContact'])->name('contact.submit');
-        
-        // Middleware individual tidak lagi diperlukan di sini
+
     });
 
 /*
@@ -74,7 +87,7 @@ Route::get('/', function () {
 });
 
 Route::get('/{path}', function ($path) {
-    $publicPaths = ['services', 'gallery', 'reviews', 'divespots', 'contact'];
+    $publicPaths = ['services', 'gallery', 'reviews', 'explore', 'contact'];
     $locale = session('locale', config('app.fallback_locale', 'en'));
 
     if (in_array($path, $publicPaths)) {
@@ -85,6 +98,10 @@ Route::get('/{path}', function ($path) {
         $categorySlug = $matches[1];
         return redirect()->route('services.category', ['locale' => $locale, 'categorySlug' => $categorySlug]);
     }
+    // !! NANTI KITA TAMBAHKAN REDIRECT UNTUK EXPLORE CATEGORY & POST !!
+    // if (preg_match('/^explore\/([a-z0-9-]+)$/', $path, $matches)) { ... }
+    // if (preg_match('/^explore\/([a-z0-9-]+)\/([a-z0-9-]+)$/', $path, $matches)) { ... }
+
 
     abort(404);
 

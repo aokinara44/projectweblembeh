@@ -5,9 +5,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\ServiceCategory;
+// !! TAMBAHKAN INI JIKA KITA MEMBUAT MODEL Article NANTI !!
+// use App\Models\Article;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Storage; // Pastikan ini ada
+use Illuminate\Support\Facades\Storage; 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
@@ -20,17 +22,16 @@ class PageController extends Controller
     private function getHeroImages(): array
     {
         $heroImages = [];
-        $heroPath = public_path('images/hero'); // Path fisik ke direktori
-        $relativePath = 'images/hero'; // Path relatif dari public/
+        $heroPath = public_path('images/hero'); 
+        $relativePath = 'images/hero'; 
 
         if (File::isDirectory($heroPath)) {
             $files = File::files($heroPath);
             foreach ($files as $file) {
-                // Gunakan asset() untuk membuat URL yang benar
                 $heroImages[] = asset($relativePath . '/' . $file->getFilename());
             }
         }
-        // Fallback jika tidak ada gambar
+        
         if (empty($heroImages)) {
             $heroImages[] = 'https://placehold.co/1600x900/003366/FFFFFF?text=Rumah+Selam+Lembeh';
         }
@@ -53,14 +54,15 @@ class PageController extends Controller
      */
     public function services()
     {
+        // !! Kita mungkin tidak perlu $serviceCategories lagi di sini jika dropdown sudah dinamis !!
+        // !! Tapi biarkan dulu untuk halaman /services !!
         $serviceCategories = ServiceCategory::with('services')->orderBy('name->en', 'asc')->get();
         $heroImages = $this->getHeroImages();
-        // Kirim null sebagai selectedCategory
         return view('pages.services', compact('serviceCategories', 'heroImages'))->with('selectedCategory', null);
     }
 
     /**
-     * Method BARU: Menampilkan halaman Services untuk kategori tertentu.
+     * Menampilkan halaman Services untuk kategori tertentu.
      */
     public function servicesByCategory(Request $request)
     {
@@ -71,14 +73,15 @@ class PageController extends Controller
             abort(404);
         }
 
-        // Cari kategori berdasarkan slug
         $serviceCategory = ServiceCategory::where('slug', $trimmedSlug)->firstOrFail();
-
-        // Eager load services
-        $serviceCategory->load('services');
+        $serviceCategory->load('services'); 
         $heroImages = $this->getHeroImages();
-        // Kirim objek kategori yang ditemukan sebagai selectedCategory
-        return view('pages.services', compact('heroImages'))->with('selectedCategory', $serviceCategory);
+
+        // !! NANTI KITA AKAN TAMBAHKAN LOGIKA UNTUK MENGAMBIL ARTIKEL TERKAIT DI SINI !!
+        // $relatedArticles = Article::where('service_category_id', $serviceCategory->id)->take(3)->get();
+
+        // !! Kirim $relatedArticles ke view NANTI !!
+        return view('pages.services', compact('heroImages'))->with('selectedCategory', $serviceCategory); 
     }
 
     /**
@@ -92,12 +95,18 @@ class PageController extends Controller
     }
 
     /**
-     * Menampilkan halaman Dive Spots.
+     * Menampilkan halaman Explore (sebelumnya Dive Spots).
      */
-    public function diveSpots()
+    // !! PERUBAHAN NAMA METHOD: diveSpots -> explore !!
+    public function explore()
     {
          $heroImages = $this->getHeroImages();
-         return view('pages.divespots', compact('heroImages'));
+         // !! NANTI KITA AKAN AMBIL DATA ARTIKEL DI SINI !!
+         // $articles = Article::latest()->paginate(9); 
+         
+         // !! PERUBAHAN NAMA VIEW: divespots -> explore !!
+         // !! Kirim $articles ke view NANTI !!
+         return view('pages.explore', compact('heroImages')); 
     }
 
     /**

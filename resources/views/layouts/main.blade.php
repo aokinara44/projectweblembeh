@@ -21,21 +21,18 @@
 
     @stack('head')
 
-    {{-- !! BLOK STYLE SUDAH DIHAPUS & DIPINDAH KE app.css !! --}}
-    
 </head>
 
 <body class="font-sans antialiased bg-gray-50 text-gray-800">
 
     @php
-        // Definisikan array navigasi utama di sini agar bisa diakses di Header & Footer
-        // Ini memperbaiki masalah urutan
+        // Definisikan array navigasi utama
         $navigationItems = [
             'home' => __('Home'),
             'services' => __('Services'),
             'gallery' => __('Gallery'),
             'reviews' => __('Reviews'),
-            'divespots' => __('Dive Spots'),
+            'explore' => __('Explore'), // Tetap 'explore' sebagai key
         ];
     @endphp
 
@@ -68,33 +65,47 @@
 
                 {{-- Navigasi Desktop --}}
                 <div class="hidden md:flex flex-grow justify-center items-center space-x-7 lg:space-x-10">
-                    
-                    @foreach ($navigationItems as $route => $label)
-                        @if ($route === 'services')
+
+                    @foreach ($navigationItems as $routeKey => $label)
+                        @if ($routeKey === 'services')
                             {{-- Dropdown Services Desktop --}}
                             <div x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false" class="relative">
                                 <button
-                                    class="flex items-center text-white text-base font-medium pb-1 border-b-2 transition duration-300 ease-in-out hover:text-yellow-300 hover:border-yellow-300 focus:outline-none text-shadow-subtle {{ request()->routeIs('services') || request()->routeIs('services.category') ? 'border-yellow-400 text-yellow-300' : 'border-transparent' }}">
+                                    class="flex items-center text-white text-base font-medium pb-1 border-b-2 transition duration-300 ease-in-out hover:text-yellow-300 hover:border-yellow-300 focus:outline-none text-shadow-subtle {{ request()->routeIs('services*') ? 'border-yellow-400 text-yellow-300' : 'border-transparent' }}">
                                     <span>{{ $label }}</span>
-                                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                                    </svg>
+                                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path> </svg>
                                 </button>
-                                <div x-show="open" x-transition:enter="transition ease-out duration-100"
-                                    x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
-                                    x-transition:leave="transition ease-in duration-75" x-transition:leave-start="opacity-100 scale-100"
-                                    x-transition:leave-end="opacity-0 scale-95"
-                                    class="absolute left-1/2 transform -translate-x-1/2 mt-1 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-20 text-gray-700"
-                                    style="display: none;">
-                                    <div class="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
-                                        
-                                        {{-- !! TAUTAN 'ALL SERVICES' SUDAH DIHAPUS !! --}}
-
-                                        {{-- Loop Kategori dari View Composer --}}
+                                <div x-show="open" x-transition:enter="transition ease-out duration-100" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-75" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
+                                    class="absolute left-1/2 transform -translate-x-1/2 mt-1 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-20 text-gray-700" style="display: none;">
+                                    <div class="py-1" role="menu" aria-orientation="vertical">
                                         @isset($serviceCategoriesForNav)
                                             @foreach($serviceCategoriesForNav as $category)
                                                 <a href="{{ route('services.category', ['locale' => app()->getLocale(), 'categorySlug' => $category->slug]) }}"
-                                                class="dropdown-item {{ request()->route('categorySlug') == $category->slug ? 'dropdown-item-active' : '' }}"
+                                                class="dropdown-item {{ request()->routeIs('services.category') && request()->route('categorySlug') == $category->slug ? 'dropdown-item-active' : '' }}"
+                                                role="menuitem">{{ $category->name }}</a>
+                                            @endforeach
+                                        @endisset
+                                    </div>
+                                </div>
+                            </div>
+                        {{-- Dropdown Explore Desktop --}}
+                        @elseif ($routeKey === 'explore')
+                            <div x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false" class="relative">
+                                <button
+                                    class="flex items-center text-white text-base font-medium pb-1 border-b-2 transition duration-300 ease-in-out hover:text-yellow-300 hover:border-yellow-300 focus:outline-none text-shadow-subtle {{ request()->routeIs('explore*') ? 'border-yellow-400 text-yellow-300' : 'border-transparent' }}">
+                                    <span>{{ $label }}</span>
+                                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path> </svg>
+                                </button>
+                                <div x-show="open" x-transition:enter="transition ease-out duration-100" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-75" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
+                                    class="absolute left-1/2 transform -translate-x-1/2 mt-1 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-20 text-gray-700" style="display: none;">
+                                    <div class="py-1" role="menu" aria-orientation="vertical">
+                                         {{-- !! TAUTAN 'ALL ARTICLES' DIHAPUS !! --}}
+                                        @isset($serviceCategoriesForNav)
+                                            @foreach($serviceCategoriesForNav as $category)
+                                                {{-- !! Tautan ini SEMENTARA !! --}}
+                                                <a href="{{ route('services.category', ['locale' => app()->getLocale(), 'categorySlug' => $category->slug]) }}"
+                                                {{-- !! Logika aktif ini SEMENTARA !! --}}
+                                                class="dropdown-item {{ request()->routeIs('explore.category') && request()->route('categorySlug') == $category->slug ? 'dropdown-item-active' : '' }}"
                                                 role="menuitem">{{ $category->name }}</a>
                                             @endforeach
                                         @endisset
@@ -103,8 +114,8 @@
                             </div>
                         @else
                             {{-- Link Navigasi Biasa --}}
-                            <a href="{{ route($route, ['locale' => app()->getLocale()]) }}"
-                                class="text-white text-base font-medium pb-1 border-b-2 transition duration-300 ease-in-out hover:text-yellow-300 hover:border-yellow-300 text-shadow-subtle {{ request()->routeIs($route) ? 'border-yellow-400 text-yellow-300' : 'border-transparent' }}">
+                            <a href="{{ route($routeKey, ['locale' => app()->getLocale()]) }}"
+                                class="text-white text-base font-medium pb-1 border-b-2 transition duration-300 ease-in-out hover:text-yellow-300 hover:border-yellow-300 text-shadow-subtle {{ request()->routeIs($routeKey) ? 'border-yellow-400 text-yellow-300' : 'border-transparent' }}">
                                 {{ $label }}
                             </a>
                         @endif
@@ -159,34 +170,49 @@
 
         {{-- Mobile Menu Panel --}}
         <div x-show="mobileMenuOpen" x-cloak @click.away="mobileMenuOpen = false"
-            x-transition:enter="transition ease-out duration-300 transform"
-            x-transition:enter-start="opacity-0 -translate-x-full" x-transition:enter-end="opacity-100 translate-x-0"
-            x-transition:leave="transition ease-in duration-300 transform"
-            x-transition:leave-start="opacity-100 translate-x-0" x-transition:leave-end="opacity-0 -translate-x-full"
+            x-transition:enter="transition ease-out duration-300 transform" x-transition:enter-start="opacity-0 -translate-x-full" x-transition:enter-end="opacity-100 translate-x-0"
+            x-transition:leave="transition ease-in duration-300 transform" x-transition:leave-start="opacity-100 translate-x-0" x-transition:leave-end="opacity-0 -translate-x-full"
             class="md:hidden fixed inset-y-0 left-0 w-72 bg-blue-800/95 backdrop-blur-sm p-6 pt-20 shadow-xl overflow-y-auto"
             style="display: none; z-index: 40 !important;">
-            <button @click="mobileMenuOpen = false" class="absolute top-4 right-4 text-white p-1 focus:outline-none"
-                aria-label="Close menu">
+            <button @click="mobileMenuOpen = false" class="absolute top-4 right-4 text-white p-1 focus:outline-none" aria-label="Close menu">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
             <div class="flex flex-col space-y-1">
-                 
-                @foreach ($navigationItems as $route => $label)
-                    @if ($route === 'services')
+
+                @foreach ($navigationItems as $routeKey => $label)
+                    @if ($routeKey === 'services')
                         {{-- Accordion Services Mobile --}}
-                        <div x-data="{ open: {{ request()->routeIs('services') || request()->routeIs('services.category') ? 'true' : 'false' }} }">
+                        <div x-data="{ open: {{ request()->routeIs('services*') ? 'true' : 'false' }} }">
                             <button @click="open = !open" class="flex items-center justify-between w-full mobile-nav-link">
                                 <span>{{ $label }}</span>
                                 <svg class="w-5 h-5 transform transition-transform duration-300" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                             </button>
                             <div x-show="open" class="mt-1 space-y-1" style="display: none;">
-                                
-                                {{-- !! TAUTAN 'ALL SERVICES' SUDAH DIHAPUS !! --}}
-
                                 @isset($serviceCategoriesForNav)
                                     @foreach($serviceCategoriesForNav as $category)
                                         <a href="{{ route('services.category', ['locale' => app()->getLocale(), 'categorySlug' => $category->slug]) }}"
-                                        class="mobile-accordion-item {{ request()->route('categorySlug') == $category->slug ? 'mobile-accordion-item-active' : '' }}">
+                                        class="mobile-accordion-item {{ request()->routeIs('services.category') && request()->route('categorySlug') == $category->slug ? 'mobile-accordion-item-active' : '' }}">
+                                            {{ $category->name }}
+                                        </a>
+                                    @endforeach
+                                @endisset
+                            </div>
+                        </div>
+                    {{-- Accordion Explore Mobile --}}
+                    @elseif ($routeKey === 'explore')
+                         <div x-data="{ open: {{ request()->routeIs('explore*') ? 'true' : 'false' }} }">
+                            <button @click="open = !open" class="flex items-center justify-between w-full mobile-nav-link">
+                                <span>{{ $label }}</span>
+                                <svg class="w-5 h-5 transform transition-transform duration-300" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </button>
+                            <div x-show="open" class="mt-1 space-y-1" style="display: none;">
+                                {{-- !! TAUTAN 'ALL ARTICLES' DIHAPUS !! --}}
+                                @isset($serviceCategoriesForNav)
+                                    @foreach($serviceCategoriesForNav as $category)
+                                         {{-- !! Tautan ini SEMENTARA !! --}}
+                                        <a href="{{ route('services.category', ['locale' => app()->getLocale(), 'categorySlug' => $category->slug]) }}"
+                                           {{-- !! Logika aktif ini SEMENTARA !! --}}
+                                           class="mobile-accordion-item {{ request()->routeIs('explore.category') && request()->route('categorySlug') == $category->slug ? 'mobile-accordion-item-active' : '' }}">
                                             {{ $category->name }}
                                         </a>
                                     @endforeach
@@ -195,8 +221,8 @@
                         </div>
                     @else
                         {{-- Link Mobile Biasa --}}
-                        <a href="{{ route($route, ['locale' => app()->getLocale()]) }}"
-                            class="{{ request()->routeIs($route) ? 'mobile-nav-link-active' : 'mobile-nav-link' }}">
+                        <a href="{{ route($routeKey, ['locale' => app()->getLocale()]) }}"
+                            class="{{ request()->routeIs($routeKey) ? 'mobile-nav-link-active' : 'mobile-nav-link' }}">
                             {{ $label }}
                         </a>
                     @endif
@@ -204,8 +230,7 @@
 
                 {{-- Language Switcher Mobile --}}
                 <div class="border-t border-blue-700/50 pt-5 mt-5">
-                    <h3 class="px-3 text-sm font-medium text-blue-300 uppercase tracking-wider mb-3">
-                        {{ __('Language') }}</h3>
+                    <h3 class="px-3 text-sm font-medium text-blue-300 uppercase tracking-wider mb-3">{{ __('Language') }}</h3>
                     <div class="space-y-1">
                         @php
                             $currentParamsMobile = request()->route() ? request()->route()->parameters() : [];
@@ -214,8 +239,7 @@
                         @endphp
                         @foreach (config('app.available_locales') as $locale => $localeName)
                             @php $newParamsMobile = array_merge(['locale' => $locale], $currentParamsMobile); @endphp
-                            <a href="{{ route($currentRouteNameMobile, $newParamsMobile) }}"
-                                class="{{ app()->getLocale() == $locale ? 'mobile-lang-link-active' : 'mobile-lang-link' }}">
+                            <a href="{{ route($currentRouteNameMobile, $newParamsMobile) }}" class="{{ app()->getLocale() == $locale ? 'mobile-lang-link-active' : 'mobile-lang-link' }}">
                                 <span class="w-6 mr-2 text-center opacity-75">{{ strtoupper($locale) }}</span>
                                 <span>{{ $localeName }}</span>
                             </a>
@@ -231,9 +255,7 @@
     </div>
     {{-- Akhir Wrapper Alpine Header --}}
 
-
     {{-- Konten Halaman Utama --}}
-    {{-- PERBAIKAN: Menambahkan 'pt-20' untuk memberi jarak dari header --}}
     <main class="flex-grow pt-20">
         {{ $slot }}
     </main>
@@ -267,9 +289,9 @@
                         <p class="text-base font-semibold mb-4 tracking-wider uppercase text-gray-100">
                             {{ __('Navigate') }}</p>
                         <ul class="space-y-2.5 text-sm">
-                            {{-- PERBAIKAN: Loop menggunakan $navigationItems --}}
-                            @foreach ($navigationItems as $route => $label)
-                             <li><a href="{{ route($route, ['locale' => app()->getLocale()]) }}" class="text-gray-300 hover:text-yellow-400 transition">{{ $label }}</a></li>
+                            {{-- Loop menggunakan $navigationItems --}}
+                            @foreach ($navigationItems as $routeKey => $label)
+                             <li><a href="{{ route($routeKey, ['locale' => app()->getLocale()]) }}" class="text-gray-300 hover:text-yellow-400 transition">{{ $label }}</a></li>
                             @endforeach
                             {{-- Link Contact --}}
                             <li><a href="{{ route('contact', ['locale' => app()->getLocale()]) }}" class="text-gray-300 hover:text-yellow-400 transition">{{ __('Contact') }}</a></li>
