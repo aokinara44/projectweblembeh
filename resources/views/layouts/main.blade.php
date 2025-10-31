@@ -108,7 +108,13 @@
                                 </div>
                             </div>
                         @else
-                            <a href="{{ route($routeKey, ['locale' => app()->getLocale()]) }}"
+                            {{-- PERUBAHAN 1 DARI 3: Mengubah link 'reviews' --}}
+                            @php
+                                $url = $routeKey === 'reviews'
+                                    ? route('home', ['locale' => app()->getLocale()]) . '/#reviews'
+                                    : route($routeKey, ['locale' => app()->getLocale()]);
+                            @endphp
+                            <a href="{{ $url }}"
                                 class="text-white text-base font-medium pb-1 border-b-2 transition duration-300 ease-in-out hover:text-yellow-300 hover:border-yellow-300 text-shadow-subtle {{ request()->routeIs($routeKey) ? 'border-yellow-400 text-yellow-300' : 'border-transparent' }}">
                                 {{ $label }}
                             </a>
@@ -208,7 +214,13 @@
                             </div>
                         </div>
                     @else
-                        <a href="{{ route($routeKey, ['locale' => app()->getLocale()]) }}"
+                        {{-- PERUBAHAN 2 DARI 3: Mengubah link 'reviews' --}}
+                        @php
+                            $url = $routeKey === 'reviews'
+                                ? route('home', ['locale' => app()->getLocale()]) . '/#reviews'
+                                : route($routeKey, ['locale' => app()->getLocale()]);
+                        @endphp
+                        <a href="{{ $url }}"
                             class="{{ request()->routeIs($routeKey) ? 'mobile-nav-link-active' : 'mobile-nav-link' }}">
                             {{ $label }}
                         </a>
@@ -269,7 +281,13 @@
                             {{ __('Navigate') }}</p>
                         <ul class="space-y-2.5 text-sm">
                             @foreach ($navigationItems as $routeKey => $label)
-                             <li><a href="{{ route($routeKey, ['locale' => app()->getLocale()]) }}" class="text-gray-300 hover:text-yellow-400 transition">{{ $label }}</a></li>
+                                {{-- PERUBAHAN 3 DARI 3: Mengubah link 'reviews' --}}
+                                @php
+                                    $url = $routeKey === 'reviews'
+                                        ? route('home', ['locale' => app()->getLocale()]) . '/#reviews'
+                                        : route($routeKey, ['locale' => app()->getLocale()]);
+                                @endphp
+                                <li><a href="{{ $url }}" class="text-gray-300 hover:text-yellow-400 transition">{{ $label }}</a></li>
                             @endforeach
                             <li><a href="{{ route('contact', ['locale' => app()->getLocale()]) }}" class="text-gray-300 hover:text-yellow-400 transition">{{ __('Contact') }}</a></li>
                         </ul>

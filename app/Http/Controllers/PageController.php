@@ -5,11 +5,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\ServiceCategory;
+use App\Models\Service; // <-- Ditambahkan
+use App\Models\Review; // <-- Ditambahkan
+use App\Models\GalleryCategory; // <-- Ditambahkan
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
 
 class PageController extends Controller
@@ -42,10 +42,15 @@ class PageController extends Controller
      */
     public function home()
     {
-        $featuredServices = \App\Models\Service::with('serviceCategory')->latest()->take(5)->get();
-        $latestReviews = \App\Models\Review::where('is_visible', true)->orderBy('created_at', 'desc')->take(5)->get();
+        $featuredServices = Service::with('serviceCategory')->latest()->take(5)->get();
+        
+        // PERUBAHAN DI SINI: Mengambil SEMUA review, bukan hanya 5
+        $allReviews = Review::where('is_visible', true)->latest()->get();
+        
         $heroImages = $this->getHeroImages();
-        return view('welcome', compact('featuredServices', 'latestReviews', 'heroImages'));
+        
+        // PERUBAHAN DI SINI: Mengganti 'latestReviews' menjadi 'allReviews'
+        return view('welcome', compact('featuredServices', 'allReviews', 'heroImages'));
     }
 
     /**
@@ -82,7 +87,7 @@ class PageController extends Controller
      */
     public function gallery()
     {
-        $galleryCategories = \App\Models\GalleryCategory::with('galleries')->orderBy('name->en', 'asc')->get();
+        $galleryCategories = GalleryCategory::with('galleries')->orderBy('name->en', 'asc')->get();
         $heroImages = $this->getHeroImages();
         return view('pages.gallery', compact('galleryCategories', 'heroImages'));
     }
@@ -120,13 +125,16 @@ class PageController extends Controller
 
     /**
      * Menampilkan halaman Reviews.
+     * FUNGSI INI DIHAPUS KARENA SUDAH TIDAK DIPAKAI
      */
+    /*
     public function reviews()
     {
         $reviews = \App\Models\Review::where('is_visible', true)->orderBy('created_at', 'desc')->paginate(10);
         $heroImages = $this->getHeroImages();
         return view('pages.reviews', compact('reviews', 'heroImages'));
     }
+    */
 
     /**
      * Menampilkan halaman Contact.
@@ -149,12 +157,8 @@ class PageController extends Controller
             'message' => 'required|string|max:2000',
         ]);
 
-        try {
-            return redirect()->route('contact', ['locale' => app()->getLocale()])
-                             ->with('success', __('contact.form.success'));
-        } catch (\Exception $e) {
-             return redirect()->route('contact', ['locale' => app()->getLocale()])
-                             ->with('error', __('contact.form.error'));
-        }
+        // PERBAIKAN: Menghapus try-catch yang tidak perlu
+        return redirect()->route('contact', ['locale' => app()->getLocale()])
+                         ->with('success', __('contact.form.success'));
     }
 }

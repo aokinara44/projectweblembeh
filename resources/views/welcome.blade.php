@@ -91,8 +91,8 @@
                                 <div class="swiper-slide">
                                     <div class="bg-white rounded-lg shadow-md overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 fade-in h-full flex flex-col">
                                         <img src="{{ $service->featured_image ? Storage::url($service->featured_image) : 'https://source.unsplash.com/400x300/?diving,ocean' }}"
-                                             alt="{{ $service->getTranslation('title', app()->getLocale(), false) }}"
-                                             class="w-full h-56 object-cover" loading="lazy" decoding="async" width="400" height="300">
+                                            alt="{{ $service->getTranslation('title', app()->getLocale(), false) }}"
+                                            class="w-full h-56 object-cover" loading="lazy" decoding="async" width="400" height="300">
                                         <div class="p-6 flex-grow">
                                             <span class="text-sm text-blue-500 font-semibold">
                                                 {{ $service->serviceCategory ? $service->serviceCategory->getTranslation('name', app()->getLocale(), false) : __('Uncategorized') }}
@@ -147,16 +147,19 @@
             </div>
         </section>
 
-        <section class="py-16 bg-gray-50">
+        {{-- PERUBAHAN 1: Menambahkan ID "reviews" dan offset scroll --}}
+        <section id="reviews" class="py-16 bg-gray-50 scroll-mt-20">
             <div class="container mx-auto px-6">
                 <div class="text-center mb-12">
                     <h2 class="text-2xl md:text-3xl font-bold text-gray-800">{{ __('reviews.latest.title') }}</h2>
                     <p class="text-gray-600 mt-2">{{ __('reviews.latest.description') }}</p>
                 </div>
-                @if(isset($latestReviews) && $latestReviews->isNotEmpty())
+                
+                {{-- PERUBAHAN 2: Menggunakan $allReviews (bukan $latestReviews) --}}
+                @if(isset($allReviews) && $allReviews->isNotEmpty())
                     <div class="swiper review-swiper relative pb-16">
                         <div class="swiper-wrapper">
-                            @foreach($latestReviews as $review)
+                            @foreach($allReviews as $review)
                                 <div class="swiper-slide">
                                     <div class="bg-white rounded-lg shadow-md p-6 flex flex-col justify-between transform hover:-translate-y-2 transition-transform duration-300 fade-in h-full">
                                         <div>
@@ -172,9 +175,10 @@
                                             </p>
                                         </div>
                                         <div class="flex items-center mt-4 pt-4 border-t border-gray-100">
-                                            <span class="inline-block h-10 w-10 rounded-full overflow-hidden bg-gray-100 mr-3">
-                                                <svg class="h-full w-full text-gray-300" fill="currentColor" viewBox="0 0 24 24"><path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
-                                            </span>
+                                            
+                                            {{-- PERUBAHAN 3: Mengganti SVG placeholder dengan Foto --}}
+                                            <img class="h-10 w-10 rounded-full object-cover mr-3" src="{{ $review->photo_url }}" alt="{{ $review->getTranslation('reviewer_name', app()->getLocale(), false) }}">
+                                            
                                             <div>
                                                 <p class="font-semibold text-gray-800">
                                                     {{ $review->getTranslation('reviewer_name', app()->getLocale(), false) }}
@@ -190,9 +194,13 @@
                 @else
                     <div class="text-center text-gray-500"><p>{{ __('reviews.latest.fallback') }}</p></div>
                 @endif
+                
+                {{-- PERUBAHAN 4: Menghapus tombol "Read All Reviews" --}}
+                {{-- 
                 <div class="text-center mt-12">
                     <a href="{{ route('reviews', ['locale' => app()->getLocale()]) }}" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition-transform transform hover:scale-105">{{ __('Read All Reviews') }}</a>
-                </div>
+                </div> 
+                --}}
             </div>
         </section>
     </div> {{-- Penutup div margin-top --}}
@@ -209,8 +217,10 @@
                     pagination: { el: '.service-pagination', clickable: true },
                     breakpoints: { 768: { slidesPerView: 2 }, 1024: { slidesPerView: 3 } }
                 });
+                
+                {{-- PERUBAHAN 5: Menggunakan $allReviews untuk logika loop Swiper --}}
                 var reviewSwiper = new Swiper('.review-swiper', {
-                    loop: {{ isset($latestReviews) && $latestReviews->count() > 3 ? 'true' : 'false' }},
+                    loop: {{ isset($allReviews) && $allReviews->count() > 3 ? 'true' : 'false' }},
                     slidesPerView: 1,
                     spaceBetween: 32,
                     autoplay: { delay: 5000, disableOnInteraction: false },

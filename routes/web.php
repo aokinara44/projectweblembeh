@@ -57,7 +57,8 @@ Route::prefix('{locale}')
         Route::get('/services', [PageController::class, 'services'])->name('services');
         Route::get('/services/{categorySlug}', [PageController::class, 'servicesByCategory'])->name('services.category');
         Route::get('/gallery', [PageController::class, 'gallery'])->name('gallery');
-        Route::get('/reviews', [PageController::class, 'reviews'])->name('reviews');
+        
+        // Route::get('/reviews', [PageController::class, 'reviews'])->name('reviews'); // <-- DIHAPUS
         
         Route::get('/explore', [PageController::class, 'explore'])->name('explore');
         Route::get('/explore/{pageSlug}', [PageController::class, 'exploreShow'])->name('explore.page');
@@ -78,7 +79,10 @@ Route::get('/', function () {
 });
 
 Route::get('/{path}', function ($path) {
-    $publicPaths = ['services', 'gallery', 'reviews', 'explore', 'contact'];
+    
+    // 'reviews' DIHAPUS DARI ARRAY INI
+    $publicPaths = ['services', 'gallery', 'explore', 'contact'];
+    
     $locale = session('locale', config('app.fallback_locale', 'en'));
 
     if (in_array($path, $publicPaths)) {
