@@ -14,9 +14,6 @@ use App\Http\Controllers\Admin\ReviewController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Middleware\SetLocale;
-// !! TAMBAHKAN IMPORT CONTROLLER BARU !!
-use App\Http\Controllers\Admin\ExploreCategoryController;
-use App\Http\Controllers\Admin\ExplorePostController;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,7 +28,6 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::middleware(SetLocale::class)->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-        // CRUD Resources
         Route::resource('service-categories', ServiceCategoryController::class);
         Route::resource('services', ServiceController::class);
         Route::resource('gallery-categories', GalleryCategoryController::class);
@@ -39,11 +35,6 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
         Route::resource('reviews', ReviewController::class);
         Route::resource('users', UserController::class);
 
-        // !! TAMBAHKAN ROUTE RESOURCE UNTUK EXPLORE !!
-        Route::resource('explore-categories', ExploreCategoryController::class);
-        Route::resource('explore-posts', ExplorePostController::class);
-
-        // Profile Routes
         Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
         Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
         Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
@@ -67,10 +58,10 @@ Route::prefix('{locale}')
         Route::get('/services/{categorySlug}', [PageController::class, 'servicesByCategory'])->name('services.category');
         Route::get('/gallery', [PageController::class, 'gallery'])->name('gallery');
         Route::get('/reviews', [PageController::class, 'reviews'])->name('reviews');
+        
         Route::get('/explore', [PageController::class, 'explore'])->name('explore');
-        // !! NANTI KITA BUAT ROUTE INI !!
-        // Route::get('/explore/{categorySlug}', [PageController::class, 'exploreByCategory'])->name('explore.category');
-        // Route::get('/explore/{categorySlug}/{postSlug}', [PageController::class, 'exploreShow'])->name('explore.show');
+        Route::get('/explore/{pageSlug}', [PageController::class, 'exploreShow'])->name('explore.page');
+
         Route::get('/contact', [PageController::class, 'contact'])->name('contact');
         Route::post('/contact', [PageController::class, 'submitContact'])->name('contact.submit');
 
@@ -98,10 +89,11 @@ Route::get('/{path}', function ($path) {
         $categorySlug = $matches[1];
         return redirect()->route('services.category', ['locale' => $locale, 'categorySlug' => $categorySlug]);
     }
-    // !! NANTI KITA TAMBAHKAN REDIRECT UNTUK EXPLORE CATEGORY & POST !!
-    // if (preg_match('/^explore\/([a-z0-9-]+)$/', $path, $matches)) { ... }
-    // if (preg_match('/^explore\/([a-z0-9-]+)\/([a-z0-9-]+)$/', $path, $matches)) { ... }
 
+    if (preg_match('/^explore\/([a-z0-9-]+)$/', $path, $matches)) {
+        $pageSlug = $matches[1];
+        return redirect()->route('explore.page', ['locale' => $locale, 'pageSlug' => $pageSlug]);
+    }
 
     abort(404);
 

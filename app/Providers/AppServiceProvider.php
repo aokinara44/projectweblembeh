@@ -5,8 +5,11 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\View; // Ditambahkan
-use App\Models\ServiceCategory; // Ditambahkan
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
+use App\Models\ServiceCategory;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -23,16 +26,55 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Menambahkan View Composer untuk layout 'main'
         View::composer('layouts.main', function ($view) {
-            // Mengambil semua kategori layanan, diurutkan berdasarkan nama (terjemahan bahasa Inggris)
-            // Hanya ambil ID, Name, dan Slug untuk efisiensi
+            
             $serviceCategoriesForNav = ServiceCategory::orderBy('name->en', 'asc')
                                         ->select('id', 'name', 'slug')
                                         ->get();
+
+            $exploreCategoriesForNav = $this->getExploreNavItems();
             
-            // Mengirim data ke view dengan nama variabel 'serviceCategoriesForNav'
-            $view->with('serviceCategoriesForNav', $serviceCategoriesForNav);
+            $view->with('serviceCategoriesForNav', $serviceCategoriesForNav)
+                 ->with('exploreCategoriesForNav', $exploreCategoriesForNav);
+        });
+    }
+
+    /**
+     * Mengambil item navigasi Explore dengan memindai folder views
+     * dan menyimpannya di cache.
+     */
+    private function getExploreNavItems(): array
+    {
+        $cacheKey = 'explore_nav_items';
+        $cacheTime = config('app.debug') ? 1 : 60 * 60 * 24; // 1 detik (debug) atau 24 jam (produksi)
+
+        return Cache::remember($cacheKey, $cacheTime, function () {
+            $items = [];
+            $path = resource_path('views/pages/explore');
+
+            if (!File::isDirectory($path)) {
+                return [];
+            }
+
+            $files = File::files($path);
+
+            foreach ($files as $file) {
+                if ($file->getExtension() === 'php') {
+                    $slug = $file->getFilenameWithoutExtension();
+                    
+                    $name = Str::of($slug)
+                                ->replace('-', ' ')
+                                ->replace('_', ' ')
+                                ->ucwords();
+
+                    $items[] = [
+                        'name' => (string) $name,
+                        'slug' => $slug,
+                    ];
+                }
+            }
+            
+            return $items;
         });
     }
 }
