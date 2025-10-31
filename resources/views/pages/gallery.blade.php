@@ -2,142 +2,177 @@
 // Lokasi File: resources/views/pages/gallery.blade.php
 ?>
 <x-main-layout>
-    @section('title', 'Gallery - Rumah Selam Lembeh')
-    @section('description', 'Explore stunning underwater photography from Lembeh Strait, featuring unique critters and vibrant marine life captured by our guests and guides.')
+    @section('title', __('gallery.title') . ' - Rumah Selam Lembeh')
+    @section('description', __('gallery.subtitle'))
 
     @push('head')
-        {{-- Lightbox CSS --}}
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/glightbox/3.2.0/css/glightbox.min.css" integrity="sha512-T+KoG3fbDoSnlgEXFQqwcTC9AdkFIxhBlmoaFqYaIjq2ShhNwNao9AKaLUPMfwiBPLigppBRTavQAtXk9zw9rw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
         <style>
-            .category-button { transition: all 0.3s ease; }
-            .category-button.active { background-color: #FACC15; color: #1E3A8A; font-weight: 600; } /* yellow-400, blue-800 */
-            .category-button:not(.active):hover { background-color: #DBEAFE; } /* blue-100 */
             .glightbox-clean .gslide-description { background: rgba(0,0,0,0.7) !important; padding: 10px 15px !important; }
-            .glightbox-clean .gslide-title { margin-bottom: 5px !important; }
+            .glightbox-clean .gslide-title { margin-bottom: 5px !important; color: #fff !important; }
+            .glightbox-clean .gdesc-inner { color: #eee !important; }
+            [x-cloak] { display: none !important; }
         </style>
     @endpush
 
-    {{-- ========================================================== --}}
-    {{-- Hero Section with Slider (Header Transparan) --}}
-    {{-- ========================================================== --}}
-    <section
-        {{-- Gunakan pengecekan isset untuk variabel heroImages --}}
-        x-data="{ images: {{ json_encode($heroImages ?? []) }}, current: 0, next() { if (this.images.length === 0) return; this.current = (this.current + 1) % this.images.length; }, init() { if (this.images.length > 1) { setInterval(() => { this.next() }, 5000); } } }"
-        x-init="init()"
-        {{-- Kunci: class absolute dan tinggi (h-[75vh]) --}}
-        class="absolute inset-x-0 top-0 h-[75vh] md:h-[80vh] bg-cover bg-center text-white flex items-center justify-center overflow-hidden"
-    >
-        <template x-for="(image, index) in images" :key="index">
-            <div
-                class="absolute inset-0 bg-cover bg-center"
-                {{-- Gunakan asset() helper dan path dari controller --}}
-                :style="'background-image: url(\'' + '{{ asset('') }}' + image + '\');'"
-                x-show="current === index"
-                x-transition:enter="transition-opacity ease-in-out duration-1000"
-                x-transition:enter-start="opacity-0"
-                x-transition:enter-end="opacity-100"
-                x-transition:leave="transition-opacity ease-in-out duration-1000"
-                x-transition:leave-start="opacity-100"
-                x-transition:leave-end="opacity-0"
-            ></div>
-        </template>
-
-        {{-- Fallback jika tidak ada gambar hero --}}
-        <div x-show="images.length === 0" class="absolute inset-0 bg-gray-600" style="background-image: url('https://placehold.co/1600x900/003366/FFFFFF?text=Rumah+Selam+Lembeh');"></div>
-
-        <div class="absolute inset-0 bg-black bg-opacity-50"></div>
-
-        <div class="relative z-10 text-center px-4 animate-fade-in-up">
-            <h1 class="text-4xl md:text-5xl font-extrabold">{{ __('gallery.header.title') }}</h1>
-            <p class="text-lg md:text-xl mt-2 text-gray-200">{{ __('gallery.header.description') }}</p>
-        </div>
-    </section>
-
-    {{-- ========================================================== --}}
-    {{-- Wrapper Konten Galeri dengan Margin Top (Mendorong Konten Ke Bawah) --}}
-    {{-- ========================================================== --}}
-    <div class="mt-[75vh] md:mt-[80vh]">
-        <section class="py-20 bg-gray-50" x-data="{ selectedCategory: 'all' }">
-            <div class="container mx-auto px-6">
-                {{-- Category Filters --}}
-                <div class="flex flex-wrap justify-center gap-2 md:gap-4 mb-12">
-                    <button @click="selectedCategory = 'all'"
-                            :class="selectedCategory === 'all' ? 'active' : ''"
-                            class="category-button px-4 py-2 rounded-full border border-gray-300 text-gray-700 bg-white font-medium text-sm md:text-base">
-                        {{ __('All') }}
+    <div class="bg-white">
+        <section
+            x-data="{ images: {{ json_encode($heroImages ?? []) }}, current: 0, interval: null,
+                      next() { this.current = (this.current + 1) % this.images.length; },
+                      prev() { this.current = (this.current - 1 + this.images.length) % this.images.length; },
+                      startSlider() { if (this.images.length > 1) { this.interval = setInterval(() => { this.next() }, 5000); } },
+                      stopSlider() { clearInterval(this.interval); this.interval = null; },
+                      initComponent() { this.startSlider(); }
+                    }"
+            x-init="initComponent()"
+            @mouseenter="stopSlider"
+            @mouseleave="startSlider"
+            class="relative h-[60vh] sm:h-[70vh] md:h-[80vh] bg-gray-900 text-white overflow-hidden"
+        >
+            <template x-for="(image, index) in images" :key="index">
+                <div
+                    class="absolute inset-0 bg-cover bg-center transition-opacity duration-1000 ease-in-out"
+                    :style="'background-image: url(\\'' + image + '\\');'"
+                    x-show="current === index"
+                    x-transition:enter="transition ease-out duration-1000"
+                    x-transition:enter-start="opacity-0"
+                    x-transition:enter-end="opacity-100"
+                    x-transition:leave="transition ease-in duration-1000"
+                    x-transition:leave-start="opacity-100"
+                    x-transition:leave-end="opacity-0"
+                >
+                    <div class="absolute inset-0 bg-black opacity-30"></div>
+                </div>
+            </template>
+            <div class="absolute inset-0 flex flex-col items-center justify-center text-center z-10 p-4">
+                 <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-shadow-lg">{{ __('gallery.title') }}</h1>
+                 <p class="mt-4 text-lg sm:text-xl lg:text-2xl text-shadow max-w-2xl">{{ __('gallery.subtitle') }}</p>
+            </div>
+            <template x-if="images.length > 1">
+                <div class="absolute inset-y-0 left-0 flex items-center z-10">
+                    <button @click="prev()" class="p-2 sm:p-4 text-white opacity-70 hover:opacity-100 focus:outline-none">
+                         <svg class="w-6 h-6 sm:w-8 sm:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
                     </button>
-                    {{-- Pengecekan isset untuk menghindari error --}}
-                    @if(isset($galleryCategories))
-                        @foreach($galleryCategories as $category)
-                            <button @click="selectedCategory = '{{ $category->slug }}'"
-                                    :class="selectedCategory === '{{ $category->slug }}' ? 'active' : ''"
-                                    class="category-button px-4 py-2 rounded-full border border-gray-300 text-gray-700 bg-white font-medium text-sm md:text-base">
-                                {{ $category->name }}
-                            </button>
-                        @endforeach
-                    @endif
+                </div>
+            </template>
+            <template x-if="images.length > 1">
+                 <div class="absolute inset-y-0 right-0 flex items-center z-10">
+                    <button @click="next()" class="p-2 sm:p-4 text-white opacity-70 hover:opacity-100 focus:outline-none">
+                       <svg class="w-6 h-6 sm:w-8 sm:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </button>
+                </div>
+            </template>
+        </section>
+
+        <section class="py-16 px-4 sm:px-6 lg:px-8 bg-gray-50"
+                 x-data="{
+                     selectedCategorySlug: 'all',
+                     categories: {{ json_encode($galleryCategories->map(function($cat) {
+                         return [
+                             'slug' => $cat->slug,
+                             'name' => $cat->getTranslation('name', app()->getLocale()),
+                             'galleries' => $cat->galleries->map(function($gal) {
+                                 return [
+                                     'id' => $gal->id,
+                                     'image_url' => Storage::url($gal->image_path),
+                                     'title' => $gal->getTranslation('title', app()->getLocale()) ?? '',
+                                     'category_slug' => $gal->galleryCategory->slug ?? ''
+                                 ];
+                             })->all()
+                         ];
+                     })) }},
+                     lightbox: null,
+                     init() {
+                         this.lightbox = GLightbox({
+                             selector: '.glightbox',
+                             touchNavigation: true,
+                             loop: false,
+                             autoplayVideos: true,
+                             titleSource: 'data-title',
+                             descriptionSource: 'data-title',
+                             descPosition: 'bottom',
+                         });
+                         this.$watch('selectedCategorySlug', () => {
+                             this.$nextTick(() => {
+                                 if (this.lightbox) {
+                                     this.lightbox.reload();
+                                 }
+                             });
+                         });
+                     }
+                 }"
+                 x-cloak>
+
+            <div class="max-w-7xl mx-auto">
+                <div class="mb-12 flex flex-wrap justify-center gap-2 sm:gap-4">
+                    <button @click="selectedCategorySlug = 'all'"
+                            :class="{
+                                'bg-yellow-400 text-blue-800 font-semibold shadow-md ring-2 ring-yellow-500 ring-offset-1': selectedCategorySlug === 'all',
+                                'bg-white text-gray-700 hover:bg-blue-100 hover:text-blue-800 border border-gray-300': selectedCategorySlug !== 'all'
+                            }"
+                            class="px-4 py-2 rounded-full text-sm sm:text-base transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-opacity-50">
+                        {{ __('gallery.all_categories') }}
+                    </button>
+                    <template x-for="category in categories" :key="category.slug">
+                        <button @click="selectedCategorySlug = category.slug"
+                                :class="{
+                                    'bg-yellow-400 text-blue-800 font-semibold shadow-md ring-2 ring-yellow-500 ring-offset-1': selectedCategorySlug === category.slug,
+                                    'bg-white text-gray-700 hover:bg-blue-100 hover:text-blue-800 border border-gray-300': selectedCategorySlug !== category.slug
+                                }"
+                                class="px-4 py-2 rounded-full text-sm sm:text-base transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-opacity-50"
+                                x-text="category.name">
+                        </button>
+                    </template>
                 </div>
 
-                {{-- Image Grid --}}
-                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
-                    {{-- !! PERBAIKAN BUG: Gunakan $galleryCategories di forelse !! --}}
-                    @if(isset($galleryCategories))
-                        @forelse($galleryCategories as $category)
-                            @foreach ($category->galleries as $gallery)
-                                <a href="{{ Storage::url($gallery->image_path) }}"
-                                   class="glightbox block rounded-lg overflow-hidden shadow-md group relative aspect-square transition-opacity duration-300"
-                                   data-gallery="gallery-{{ $category->slug }}"
-                                   data-description="{{ $gallery->description ? e($gallery->description) : '' }}"
-                                   data-title="{{ e($gallery->name) }}"
-                                   :data-category-slug="'{{ $category->slug }}'"
-                                   x-show="selectedCategory === 'all' || selectedCategory === '{{ $category->slug }}'"
-                                   x-transition:enter="transition ease-out duration-300"
-                                   x-transition:enter-start="opacity-0 scale-95"
-                                   x-transition:enter-end="opacity-100 scale-100"
-                                   x-transition:leave="transition ease-in duration-200"
-                                   x-transition:leave-start="opacity-100 scale-100"
-                                   x-transition:leave-end="opacity-0 scale-95"
-                                   style="display: none;"
-                                   x-cloak>
-                                    <img src="{{ Storage::url($gallery->image_path) }}"
-                                         alt="{{ $gallery->name }}"
-                                         title="{{ $gallery->name }}"
-                                         class="w-full h-full object-cover transform group-hover:scale-110 transition duration-300"
-                                         loading="lazy">
-                                    <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition duration-300 flex items-end justify-center p-2">
-                                        <p class="text-white text-xs text-center opacity-0 group-hover:opacity-100 transition duration-300 truncate">
-                                            {{ $gallery->name }}
-                                        </p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    <template x-for="category in categories" :key="'cat-' + category.slug">
+                        <template x-for="gallery in category.galleries" :key="gallery.id">
+                            <div x-show="selectedCategorySlug === 'all' || selectedCategorySlug === gallery.category_slug"
+                                 x-transition:enter="transition ease-out duration-300"
+                                 x-transition:enter-start="opacity-0 scale-90"
+                                 x-transition:enter-end="opacity-100 scale-100"
+                                 x-transition:leave="transition ease-in duration-150"
+                                 x-transition:leave-start="opacity-100 scale-100"
+                                 x-transition:leave-end="opacity-0 scale-90"
+                                 class="relative group overflow-hidden rounded-lg shadow-md aspect-square bg-gray-200">
+                                <a :href="gallery.image_url"
+                                   class="glightbox block w-full h-full"
+                                   :data-gallery="'gallery-' + (selectedCategorySlug === 'all' ? 'all' : category.slug)"
+                                   :data-title="gallery.title"
+                                   :data-description="gallery.title">
+                                    <img :src="gallery.image_url"
+                                         :alt="gallery.title"
+                                         loading="lazy"
+                                         class="w-full h-full object-cover transform transition duration-500 ease-in-out group-hover:scale-110 group-hover:brightness-75">
+                                    <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                         <svg class="w-10 h-10 text-white drop-shadow-md" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                                        </svg>
+                                    </div>
+                                    <div class="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                        <h3 class="text-white text-sm font-medium truncate" x-text="gallery.title"></h3>
                                     </div>
                                 </a>
-                            @endforeach
-                        @empty
-                            <p class="col-span-full text-center text-gray-500 py-10">{{ __('No images found in the gallery yet.') }}</p>
-                        @endforelse
-                    @else
-                        {{-- Fallback jika variabel $galleryCategories tidak di-pass sama sekali --}}
-                        <p class="col-span-full text-center text-gray-500 py-10">{{ __('Error loading gallery categories.') }}</p>
-                    @endif
+                            </div>
+                        </template>
+                    </template>
+                     <div x-show="!categories.length || categories.flatMap(c => c.galleries).filter(g => selectedCategorySlug === 'all' || selectedCategorySlug === g.category_slug).length === 0"
+                          class="col-span-full text-center text-gray-500 py-10">
+                         {{ __('gallery.no_images_in_category') }}
+                     </div>
                 </div>
+
+                 {{-- Pastikan ini adalah baris 183 --}}
+                 @if($galleryCategories->isEmpty() && !$errors->any())
+                    <p class="col-span-full text-center text-gray-500 py-10">{{ __('gallery.no_galleries_yet') }}</p>
+                 @endif
+
             </div>
         </section>
     </div>
 
     @push('scripts')
-        {{-- Lightbox JS --}}
         <script src="https://cdnjs.cloudflare.com/ajax/libs/glightbox/3.2.0/js/glightbox.min.js" integrity="sha512-S/H9RQ6govCzeA7F9D0m8NGfsGf0/HjJEiLEfWGaMCjFzavo+DkRbYtZLSO+X6cZsIKQ6JvV/7Y9YMaYnSGnAA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-        <script>
-            document.addEventListener('DOMContentLoaded', () => {
-                const lightbox = GLightbox({
-                    selector: '.glightbox',
-                    touchNavigation: true,
-                    loop: false,
-                    titleSource: 'data-title',
-                    descriptionSource: 'data-description',
-                    descPosition: 'bottom',
-                });
-            });
-        </script>
     @endpush
-
 </x-main-layout>
