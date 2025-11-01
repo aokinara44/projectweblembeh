@@ -27,15 +27,15 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         View::composer('layouts.main', function ($view) {
-            
+
             $serviceCategoriesForNav = ServiceCategory::orderBy('name->en', 'asc')
-                                        ->select('id', 'name', 'slug')
-                                        ->get();
+                ->select('id', 'name', 'slug')
+                ->get();
 
             $exploreCategoriesForNav = $this->getExploreNavItems();
-            
+
             $view->with('serviceCategoriesForNav', $serviceCategoriesForNav)
-                 ->with('exploreCategoriesForNav', $exploreCategoriesForNav);
+                ->with('exploreCategoriesForNav', $exploreCategoriesForNav);
         });
     }
 
@@ -59,21 +59,34 @@ class AppServiceProvider extends ServiceProvider
             $files = File::files($path);
 
             foreach ($files as $file) {
-                if ($file->getExtension() === 'php') {
-                    $slug = $file->getFilenameWithoutExtension();
-                    
+                // --- AWAL PERBAIKAN ---
+                $filename = $file->getFilename(); // Cth: "diving.blade.php"
+
+                // 1. Kita cek manual untuk file .blade.php
+                if (Str::endsWith($filename, '.blade.php')) {
+
+                    // 2. Ambil nama file sebelum ".blade.php"
+                    $slug = Str::before($filename, '.blade.php'); // Cth: "diving"
+
+                    // 3. Lewati file 'index' jika ada (agar tidak jadi sub-menu)
+                    if ($slug === 'index') {
+                        continue;
+                    }
+
+                    // 4. Ganti ->ucwords() menjadi ->title() (Fix error asli)
                     $name = Str::of($slug)
-                                ->replace('-', ' ')
-                                ->replace('_', ' ')
-                                ->ucwords();
+                        ->replace('-', ' ')
+                        ->replace('_', ' ')
+                        ->title(); // Cth: "Diving"
 
                     $items[] = [
                         'name' => (string) $name,
                         'slug' => $slug,
                     ];
                 }
+                // --- AKHIR PERBAIKAN ---
             }
-            
+
             return $items;
         });
     }

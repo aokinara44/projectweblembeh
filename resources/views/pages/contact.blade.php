@@ -10,18 +10,14 @@
     <section
         x-data="{ images: {{ json_encode($heroImages ?? []) }}, current: 0, next() { this.current = (this.current + 1) % this.images.length; }, init() { if (this.images.length > 1) { setInterval(() => { this.next() }, 5000); } } }"
         x-init="init()"
-        {{-- Jadikan absolut, tempel ke atas, beri tinggi (h-[75vh] md:h-[80vh]) --}}
         class="absolute inset-x-0 top-0 h-[75vh] md:h-[80vh] bg-cover bg-center text-white flex items-center justify-center overflow-hidden"
     >
         <template x-for="(image, index) in images" :key="index">
-            {{-- Path gambar menggunakan asset() helper agar konsisten dengan welcome.blade.php --}}
-            {{-- Jika path '/images/hero/...' sudah benar, ini akan bekerja. --}}
-            {{-- Jika tidak, kita bisa ubah ke :style="'background-image: url(\'/' + image + '\');'" --}}
+             {{-- Menggunakan asset() untuk URL gambar --}}
             <div
                 class="absolute inset-0 bg-cover bg-center"
-                :style="'background-image: url(\'{{ asset('') }}' + image + '\');'"
+                :style="'background-image: url(\'' + image + '\');'"
                 x-show="current === index"
-                {{-- Tambahkan transisi fade --}}
                 x-transition:enter="transition-opacity ease-in-out duration-1000"
                 x-transition:enter-start="opacity-0"
                 x-transition:enter-end="opacity-100"
@@ -30,12 +26,10 @@
                 x-transition:leave-end="opacity-0"
             ></div>
         </template>
-
-        {{-- Fallback jika tidak ada gambar --}}
+        {{-- Fallback jika tidak ada gambar (Logika dari Anda) --}}
         <div x-show="images.length === 0" class="absolute inset-0 bg-gray-600" style="background-image: url('https://placehold.co/1600x900/003366/FFFFFF?text=Rumah+Selam+Lembeh');"></div>
-
         <div class="absolute inset-0 bg-black bg-opacity-50"></div>
-
+        <div class="relative z-10 text-center px-4 animate-fade-in-up">
         {{-- Konten header (Judul & Deskripsi) --}}
         <div class="relative z-10 text-center px-4 animate-fade-in-up">
             {{-- Menggunakan key JSON dari halaman kontak --}}
