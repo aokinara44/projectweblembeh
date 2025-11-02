@@ -1,7 +1,5 @@
 <?php
 
-// Lokasi File: routes/web.php
-
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\ProfileController;
@@ -12,7 +10,7 @@ use App\Http\Controllers\Admin\GalleryCategoryController;
 use App\Http\Controllers\Admin\GalleryController;
 use App\Http\Controllers\Admin\ReviewController;
 use App\Http\Controllers\Admin\UserController;
-use App\Http\Controllers\Admin\ContactController; // <-- 1. DITAMBAHKAN
+use App\Http\Controllers\Admin\ContactController; // Pastikan ini ada
 use App\Http\Controllers\SitemapController;
 use App\Http\Middleware\SetLocale;
 
@@ -21,12 +19,16 @@ use App\Http\Middleware\SetLocale;
 | GRUP 1: RUTE NON-LOCALE (ADMIN, AUTH, SISTEM)
 |--------------------------------------------------------------------------
 */
-Route::middleware(SetLocale::class)->group(function () {
-    require __DIR__ . '/auth.php';
-});
 
+// ==========================================================
+// PERBAIKAN BUG LOGIN
+// Rute Auth dipindahkan keluar dari middleware SetLocale
+// ==========================================================
+require __DIR__ . '/auth.php';
+
+// Rute Admin
 Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () {
-    Route::middleware(SetLocale::class)->group(function () {
+    Route::middleware(SetLocale::class)->group(function () { // Middleware SetLocale HANYA untuk panel admin
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
         Route::resource('service-categories', ServiceCategoryController::class);
@@ -35,7 +37,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
         Route::resource('galleries', GalleryController::class);
         Route::resource('reviews', ReviewController::class);
         Route::resource('users', UserController::class);
-        Route::resource('contacts', ContactController::class); // <-- 2. DITAMBAHKAN
+        Route::resource('contacts', ContactController::class);
 
         Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
         Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -43,7 +45,9 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     });
 });
 
+// Rute Sistem
 Route::get('/sitemap.xml', [SitemapController::class, 'generate'])->name('sitemap');
+
 
 /*
 |--------------------------------------------------------------------------
@@ -52,15 +56,13 @@ Route::get('/sitemap.xml', [SitemapController::class, 'generate'])->name('sitema
 */
 Route::prefix('{locale}')
     ->where(['locale' => '[a-zA-Z]{2}'])
-    ->middleware(SetLocale::class)
+    ->middleware(SetLocale::class) // SetLocale juga digunakan di sini untuk memvalidasi {locale} dari URL
     ->group(function () {
 
         Route::get('/', [PageController::class, 'home'])->name('home');
         Route::get('/services', [PageController::class, 'services'])->name('services');
         Route::get('/services/{categorySlug}', [PageController::class, 'servicesByCategory'])->name('services.category');
         Route::get('/gallery', [PageController::class, 'gallery'])->name('gallery');
-        
-        // Route::get('/reviews', [PageController::class, 'reviews'])->name('reviews'); // <-- DIHAPUS
         
         Route::get('/explore', [PageController::class, 'explore'])->name('explore');
         Route::get('/explore/{pageSlug}', [PageController::class, 'exploreShow'])->name('explore.page');
@@ -82,7 +84,6 @@ Route::get('/', function () {
 
 Route::get('/{path}', function ($path) {
     
-    // 'reviews' DIHAPUS DARI ARRAY INI
     $publicPaths = ['services', 'gallery', 'explore', 'contact'];
     
     $locale = session('locale', config('app.fallback_locale', 'en'));

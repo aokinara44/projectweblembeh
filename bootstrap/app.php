@@ -12,11 +12,20 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         
-        // !! TAMBAHKAN INI !!
         // Mendaftarkan middleware SetLocale agar bisa ganti bahasa
         $middleware->web(append: [
             \App\Http\Middleware\SetLocale::class,
         ]);
+
+        // ==========================================================
+        // !! TAMBAHKAN BLOK INI !!
+        // Ini adalah perbaikan untuk bug redirect login.
+        // Kita memberi tahu Laravel untuk menggunakan file Middleware guest
+        // kustom buatan kita, BUKAN file bawaan Laravel.
+        $middleware->alias([
+            'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
+        ]);
+        // ==========================================================
         
     })
     ->withExceptions(function (Exceptions $exceptions) {
