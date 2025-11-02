@@ -27,7 +27,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        View::composer('layouts.main', function ($view) {
+        // 3. PERUBAHAN UTAMA: Tambahkan 'pages.contact' ke dalam array
+        View::composer(['layouts.main', 'pages.contact'], function ($view) {
 
             // Waktu cache: 1 detik (debug) atau 24 jam (produksi)
             $cacheTime = config('app.debug') ? 1 : 60 * 60 * 24;
@@ -38,11 +39,11 @@ class AppServiceProvider extends ServiceProvider
 
             $exploreCategoriesForNav = $this->getExploreNavItems();
 
-            // 3. TAMBAHKAN LOGIKA BARU UNTUK MENGAMBIL KONTAK
+            // 4. TAMBAHKAN KEMBALI LOGIKA KONTAK
             $siteContacts = Cache::remember('site_contacts', $cacheTime, function () {
                 // Ambil semua kontak yang aktif
                 // Urutkan berdasarkan nama (agar konsisten)
-                // Lalu kelompokkan berdasarkan 'type' (phone, email, social, address)
+                // Lalu kelompokkan berdasarkan 'type' (phone, email, social, address, qr_code)
                 return Contact::where('is_active', true)
                                 ->orderBy('name')
                                 ->get()
@@ -51,7 +52,7 @@ class AppServiceProvider extends ServiceProvider
 
             $view->with('serviceCategoriesForNav', $serviceCategoriesForNav)
                 ->with('exploreCategoriesForNav', $exploreCategoriesForNav)
-                ->with('siteContacts', $siteContacts); // 4. TAMBAHKAN VARIABEL INI KE VIEW
+                ->with('siteContacts', $siteContacts); // 5. TAMBAHKAN VARIABEL INI KE VIEW
         });
     }
 

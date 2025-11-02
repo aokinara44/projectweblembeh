@@ -314,7 +314,7 @@
                             @if(isset($siteContacts['phone']) && $siteContacts['phone']->isNotEmpty())
                                 @foreach($siteContacts['phone'] as $phone)
                                 <li class="flex items-center">
-                                    <svg class="w-4 h-4 mr-2 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg> 
+                                    <svg class="w-4 h-4 mr-2 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
                                     <a href="tel:{{ preg_replace('/[^0-9+]/', '', $phone->value) }}" class="hover:text-yellow-400 transition">{{ $phone->value }}</a>
                                 </li>
                                 @endforeach
@@ -383,7 +383,7 @@
                         {{-- ============================================= --}}
                     </div>
                 </div>
-                <div class="mt-10 border-t border-gray-700/50 pt-6 text-center text-gray-500 text-sm">&copy;
+                <div class="mt-10 border-t border-gray-700/50 pt-6 text-center text-gray-500 text-sm">©
                     {{ date('Y') }} Rumah Selam Lembeh Dive Center. All Rights Reserved.</div>
             </div>
         </footer>
