@@ -7,9 +7,10 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Cache; // 1. TAMBAHKAN
 use Illuminate\Support\Str;
 use App\Models\ServiceCategory;
+use App\Models\Contact; // 2. TAMBAHKAN
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -28,14 +29,29 @@ class AppServiceProvider extends ServiceProvider
     {
         View::composer('layouts.main', function ($view) {
 
+            // Waktu cache: 1 detik (debug) atau 24 jam (produksi)
+            $cacheTime = config('app.debug') ? 1 : 60 * 60 * 24;
+
             $serviceCategoriesForNav = ServiceCategory::orderBy('name->en', 'asc')
                 ->select('id', 'name', 'slug')
                 ->get();
 
             $exploreCategoriesForNav = $this->getExploreNavItems();
 
+            // 3. TAMBAHKAN LOGIKA BARU UNTUK MENGAMBIL KONTAK
+            $siteContacts = Cache::remember('site_contacts', $cacheTime, function () {
+                // Ambil semua kontak yang aktif
+                // Urutkan berdasarkan nama (agar konsisten)
+                // Lalu kelompokkan berdasarkan 'type' (phone, email, social, address)
+                return Contact::where('is_active', true)
+                                ->orderBy('name')
+                                ->get()
+                                ->groupBy('type');
+            });
+
             $view->with('serviceCategoriesForNav', $serviceCategoriesForNav)
-                ->with('exploreCategoriesForNav', $exploreCategoriesForNav);
+                ->with('exploreCategoriesForNav', $exploreCategoriesForNav)
+                ->with('siteContacts', $siteContacts); // 4. TAMBAHKAN VARIABEL INI KE VIEW
         });
     }
 

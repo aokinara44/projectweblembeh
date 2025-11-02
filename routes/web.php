@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\GalleryCategoryController;
 use App\Http\Controllers\Admin\GalleryController;
 use App\Http\Controllers\Admin\ReviewController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\ContactController; // <-- 1. DITAMBAHKAN
 use App\Http\Controllers\SitemapController;
 use App\Http\Middleware\SetLocale;
 
@@ -34,6 +35,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
         Route::resource('galleries', GalleryController::class);
         Route::resource('reviews', ReviewController::class);
         Route::resource('users', UserController::class);
+        Route::resource('contacts', ContactController::class); // <-- 2. DITAMBAHKAN
 
         Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
         Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

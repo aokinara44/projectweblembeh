@@ -8,7 +8,7 @@
     if (request()->routeIs('admin.service*')) $activeMenu = 'services';
     elseif (request()->routeIs('admin.gallery*')) $activeMenu = 'media';
     elseif (request()->routeIs('admin.review*')) $activeMenu = 'feedback';
-    elseif (request()->routeIs('admin.user*') || request()->routeIs('admin.profile*')) $activeMenu = 'management';
+    elseif (request()->routeIs('admin.user*') || request()->routeIs('admin.profile*') || request()->routeIs('admin.contact*')) $activeMenu = 'management'; // <-- 1. DIUBAH
 @endphp
 
 <div x-data="{
@@ -54,7 +54,7 @@
                  const floatingMenu = this.floatingDropdown ? this.$refs[this.floatingDropdown + 'Floating'] : null;
                  const isClickInsideFloatingMenu = floatingMenu && floatingMenu.contains(event.target);
                  if (!isClickInsideSidebar && !isClickInsideFloatingMenu) {
-                      this.closeFloating();
+                     this.closeFloating();
                  }
             });
         }
@@ -74,8 +74,8 @@
                  x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
                  x-transition:leave="transition ease-in duration-100" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
                  class="flex flex-col -space-y-1">
-                 <span class="font-semibold text-lg whitespace-nowrap text-blue-600">Rumah Selam</span>
-                 <span class="text-yellow-500 text-sm whitespace-nowrap">Dive Center</span>
+                <span class="font-semibold text-lg whitespace-nowrap text-blue-600">Rumah Selam</span>
+                <span class="text-yellow-500 text-sm whitespace-nowrap">Dive Center</span>
             </div>
         </a>
     </div>
@@ -109,10 +109,10 @@
             <button @click="sidebarMinimized ? toggleFloating('media', $event) : toggleAccordion('media')"
                     class="w-full flex items-center justify-between text-left px-3 py-2.5 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors duration-150 ease-in-out"
                      :class="{
-                        'bg-gray-100 text-gray-900': activeDropdown === 'media' && !sidebarMinimized,
-                        'justify-start': !sidebarMinimized,
-                        'justify-center': sidebarMinimized
-                    }">
+                         'bg-gray-100 text-gray-900': activeDropdown === 'media' && !sidebarMinimized,
+                         'justify-start': !sidebarMinimized,
+                         'justify-center': sidebarMinimized
+                     }">
                  <div class="flex items-center overflow-hidden whitespace-nowrap">
                     <svg class="w-6 h-6 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" /></svg>
                     <span class="ml-3 font-medium" x-show="!sidebarMinimized" x-transition:fade>Media</span>
@@ -129,10 +129,10 @@
             <button @click="sidebarMinimized ? toggleFloating('feedback', $event) : toggleAccordion('feedback')"
                     class="w-full flex items-center justify-between text-left px-3 py-2.5 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors duration-150 ease-in-out"
                      :class="{
-                        'bg-gray-100 text-gray-900': activeDropdown === 'feedback' && !sidebarMinimized,
-                        'justify-start': !sidebarMinimized,
-                        'justify-center': sidebarMinimized
-                    }">
+                         'bg-gray-100 text-gray-900': activeDropdown === 'feedback' && !sidebarMinimized,
+                         'justify-start': !sidebarMinimized,
+                         'justify-center': sidebarMinimized
+                     }">
                  <div class="flex items-center overflow-hidden whitespace-nowrap">
                     <svg class="w-6 h-6 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.31h5.513c.498 0 .704.656.34.98l-4.46 3.24a.563.563 0 00-.182.63l2.125 5.111a.563.563 0 01-.84.62l-4.46-3.24a.563.563 0 00-.656 0l-4.46 3.24a.563.563 0 01-.84-.62l2.125-5.111a.563.563 0 00-.182-.63l-4.46-3.24a.563.563 0 01.34-.98h5.513a.563.563 0 00.475-.31l2.125-5.111z" /></svg>
                     <span class="ml-3 font-medium" x-show="!sidebarMinimized" x-transition:fade>Feedback</span>
@@ -148,10 +148,10 @@
             <button @click="sidebarMinimized ? toggleFloating('management', $event) : toggleAccordion('management')"
                     class="w-full flex items-center justify-between text-left px-3 py-2.5 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors duration-150 ease-in-out"
                      :class="{
-                        'bg-gray-100 text-gray-900': activeDropdown === 'management' && !sidebarMinimized,
-                        'justify-start': !sidebarMinimized,
-                        'justify-center': sidebarMinimized
-                    }">
+                         'bg-gray-100 text-gray-900': activeDropdown === 'management' && !sidebarMinimized,
+                         'justify-start': !sidebarMinimized,
+                         'justify-center': sidebarMinimized
+                     }">
                  <div class="flex items-center overflow-hidden whitespace-nowrap">
                     <svg class="w-6 h-6 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m-4.682 2.72a.5.5 0 01-.063.03c-.38.166-.78.29-1.2.37M10.5 11.25a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M12.75 15.11A5.23 5.23 0 0110.5 15c-1.43 0-2.734-.5-3.75-1.35M16.5 11.25a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M21 12.75V9A2.25 2.25 0 0018.75 6.75h-9A2.25 2.25 0 007.5 9v3.75m13.5 0A2.25 2.25 0 0118.75 15h-9a2.25 2.25 0 01-2.25-2.25V9A2.25 2.25 0 017.5 6.75h9A2.25 2.25 0 0121 9v3.75M3 13.5A2.25 2.25 0 01.75 11.25V9A2.25 2.25 0 013 6.75h3A2.25 2.25 0 018.25 9v3.75A2.25 2.25 0 016 15H3m14.25-6.09A5.23 5.23 0 0115 7.5c-1.43 0-2.734-.5-3.75 1.35M16.5 15c-1.016.85-2.32 1.35-3.75 1.35A5.23 5.23 0 017.5 15" /></svg>
                     <span class="ml-3 font-medium" x-show="!sidebarMinimized" x-transition:fade>Management</span>
@@ -160,6 +160,7 @@
             </button>
             <div x-show="activeDropdown === 'management' && !sidebarMinimized" x-collapse x-cloak class="mt-1 space-y-0.5">
                 <x-nav-link class="block w-full pl-10 pr-4 py-1.5 text-sm rounded-md text-gray-500 hover:bg-gray-100 hover:text-gray-900" :href="route('admin.users.index', ['locale' => app()->getLocale()])" :active="request()->routeIs('admin.users.*')"> {{ __('Users') }} </x-nav-link>
+                <x-nav-link class="block w-full pl-10 pr-4 py-1.5 text-sm rounded-md text-gray-500 hover:bg-gray-100 hover:text-gray-900" :href="route('admin.contacts.index', ['locale' => app()->getLocale()])" :active="request()->routeIs('admin.contacts.*')"> {{ __('Contacts') }} </x-nav-link> {{-- <-- 2. DITAMBAHKAN --}}
                 <x-nav-link class="block w-full pl-10 pr-4 py-1.5 text-sm rounded-md text-gray-500 hover:bg-gray-100 hover:text-gray-900" :href="route('admin.profile.edit', ['locale' => app()->getLocale()])" :active="request()->routeIs('admin.profile.*')"> {{ __('My Profile') }} </x-nav-link>
             </div>
         </div>
@@ -203,6 +204,7 @@
                class="absolute w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 py-1"
                style="display: none;">
                <x-nav-link class="block w-full px-4 py-1.5 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" :href="route('admin.users.index', ['locale' => app()->getLocale()])" :active="request()->routeIs('admin.users.*')"> {{ __('Users') }} </x-nav-link>
+               <x-nav-link class="block w-full px-4 py-1.5 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" :href="route('admin.contacts.index', ['locale' => app()->getLocale()])" :active="request()->routeIs('admin.contacts.*')"> {{ __('Contacts') }} </x-nav-link> {{-- <-- 3. DITAMBAHKAN --}}
                <x-nav-link class="block w-full px-4 py-1.5 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" :href="route('admin.profile.edit', ['locale' => app()->getLocale()])" :active="request()->routeIs('admin.profile.*')"> {{ __('My Profile') }} </x-nav-link>
          </div>
     </div>

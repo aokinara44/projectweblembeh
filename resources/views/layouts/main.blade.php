@@ -108,7 +108,6 @@
                                 </div>
                             </div>
                         @else
-                            {{-- PERUBAHAN 1 DARI 3: Mengubah link 'reviews' --}}
                             @php
                                 $url = $routeKey === 'reviews'
                                     ? route('home', ['locale' => app()->getLocale()]) . '/#reviews'
@@ -214,7 +213,6 @@
                             </div>
                         </div>
                     @else
-                        {{-- PERUBAHAN 2 DARI 3: Mengubah link 'reviews' --}}
                         @php
                             $url = $routeKey === 'reviews'
                                 ? route('home', ['locale' => app()->getLocale()]) . '/#reviews'
@@ -281,7 +279,6 @@
                             {{ __('Navigate') }}</p>
                         <ul class="space-y-2.5 text-sm">
                             @foreach ($navigationItems as $routeKey => $label)
-                                {{-- PERUBAHAN 3 DARI 3: Mengubah link 'reviews' --}}
                                 @php
                                     $url = $routeKey === 'reviews'
                                         ? route('home', ['locale' => app()->getLocale()]) . '/#reviews'
@@ -295,23 +292,95 @@
                     <div>
                         <p class="text-base font-semibold mb-4 tracking-wider uppercase text-gray-100">
                             {{ __('Contact') }}</p>
+                        
+                        {{-- ============================================= --}}
+                        {{-- START PERUBAHAN FOOTER (KONTAK) --}}
+                        {{-- ============================================= --}}
                         <ul class="space-y-2.5 text-sm text-gray-300">
-                            <li class="flex items-start"><svg class="w-4 h-4 mr-2 mt-1 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0zM15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> <span>Pintu Kota Kecil, Lembeh Sel., Kota Bitung, Sulawesi Utara</span></li>
-                            <li class="flex items-center"><svg class="w-4 h-4 mr-2 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg> <a href="tel:+6281238455307" class="hover:text-yellow-400 transition">+62 812-3845-5307</a></li>
-                            <li class="flex items-center"><svg class="w-4 h-4 mr-2 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg> <a href="mailto:Rumahselamindo@gmail.com" class="hover:text-yellow-400 transition">Rumahselamindo@gmail.com</a></li>
+                            @if(isset($siteContacts['address']) && $siteContacts['address']->isNotEmpty())
+                                @foreach($siteContacts['address'] as $address)
+                                <li class="flex items-start">
+                                    <svg class="w-4 h-4 mr-2 mt-1 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0zM15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> 
+                                    <a href="https://maps.app.goo.gl/ufBVhMSHQpiWezw5A" class="hover:text-yellow-400 transition">{{ $address->value }}</a>
+                                </li>
+                                @endforeach
+                            @else
+                                <li class="flex items-start">
+                                    <svg class="w-4 h-4 mr-2 mt-1 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0zM15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> 
+                                    <span>{{ __('Address not available') }}</span>
+                                </li>
+                            @endif
+
+                            @if(isset($siteContacts['phone']) && $siteContacts['phone']->isNotEmpty())
+                                @foreach($siteContacts['phone'] as $phone)
+                                <li class="flex items-center">
+                                    <svg class="w-4 h-4 mr-2 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg> 
+                                    <a href="tel:{{ preg_replace('/[^0-9+]/', '', $phone->value) }}" class="hover:text-yellow-400 transition">{{ $phone->value }}</a>
+                                </li>
+                                @endforeach
+                            @endif
+                            
+                            @if(isset($siteContacts['email']) && $siteContacts['email']->isNotEmpty())
+                                @foreach($siteContacts['email'] as $email)
+                                <li class="flex items-center">
+                                    <svg class="w-4 h-4 mr-2 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg> 
+                                    <a href="mailto:{{ $email->value }}" class="hover:text-yellow-400 transition">{{ $email->value }}</a>
+                                </li>
+                                @endforeach
+                            @endif
                         </ul>
+                        {{-- ============================================= --}}
+                        {{-- AKHIR PERUBAHAN FOOTER (KONTAK) --}}
+                        {{-- ============================================= --}}
+
                     </div>
                     <div>
                         <p class="text-base font-semibold mb-4 tracking-wider uppercase text-gray-100">
                             {{ __('Follow Us') }}</p>
+                        
+                        {{-- ============================================= --}}
+                        {{-- START PERUBAHAN FOOTER (SOSIAL MEDIA) --}}
+                        {{-- ============================================= --}}
                         <div class="flex space-x-5">
-                            <a href="https://www.facebook.com/rumahselam.lembeh" target="_blank" class="text-gray-400 hover:text-blue-500 transition duration-300" aria-label="Follow us on Facebook">
-                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M14 13.5h2.5l1-4H14v-2c0-1.5 0-2 2-2h2V2h-4c-4 0-5 3-5 5v2H7.5v4H10v7h4v-7z" /></svg>
-                            </a>
-                            <a href="https://www.instagram.com/rumahselamdc" target="_blank" class="text-gray-400 hover:text-pink-500 transition duration-300" aria-label="Follow us on Instagram">
-                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm4.5-11.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5-1.5-.67-1.5-1.5.67-1.5 1.5-1.5zm-5 1.5c-1.93 0-3.5 1.57-3.5 3.5s1.57 3.5 3.5 3.5 3.5-1.57 3.5-3.5-1.57-3.5-3.5-3.5zm0 5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z" clip-rule="evenodd" /></svg>
-                            </a>
+                            @if(isset($siteContacts['social']) && $siteContacts['social']->isNotEmpty())
+                                @foreach($siteContacts['social'] as $social)
+                                    <a href="{{ $social->value }}" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-yellow-400 transition duration-300" aria-label="Follow us on {{ $social->name }}">
+                                        @if($social->icon_svg)
+                                            {!! $social->icon_svg !!} {{-- Ini akan merender SVG Anda --}}
+                                        @else
+                                            {{-- Fallback jika tidak ada SVG --}}
+                                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M14 13.5h2.5l1-4H14v-2c0-1.5 0-2 2-2h2V2h-4c-4 0-5 3-5 5v2H7.5v4H10v7h4v-7z" /></svg>
+                                        @endif
+                                    </a>
+                                @endforeach
+                            @else
+                                {{-- Menampilkan ikon default jika tidak ada data, agar layout tidak rusak --}}
+                                <a href="#" class="text-gray-400 hover:text-blue-500 transition duration-300" aria-label="Follow us on Facebook">
+                                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M14 13.5h2.5l1-4H14v-2c0-1.5 0-2 2-2h2V2h-4c-4 0-5 3-5 5v2H7.5v4H10v7h4v-7z" /></svg>
+                                </a>
+                                <a href="#" class="text-gray-400 hover:text-pink-500 transition duration-300" aria-label="Follow us on Instagram">
+                                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm4.5-11.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5-1.5-.67-1.5-1.5.67-1.5 1.5-1.5zm-5 1.5c-1.93 0-3.5 1.57-3.5 3.5s1.57 3.5 3.5 3.5 3.5-1.57 3.5-3.5-1.57-3.5-3.5-3.5zm0 5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z" clip-rule="evenodd" /></svg>
+                                </a>
+                            @endif
                         </div>
+                        {{-- ============================================= --}}
+                        {{-- AKHIR PERUBAHAN FOOTER (SOSIAL MEDIA) --}}
+                        {{-- ============================================= --}}
+
+                        {{-- ============================================= --}}
+                        {{-- START PERUBAHAN FOOTER (KODE QR) --}}
+                        {{-- ============================================= --}}
+                        @if(isset($siteContacts['qr_code']) && $siteContacts['qr_code']->isNotEmpty())
+                            @foreach($siteContacts['qr_code'] as $qr)
+                                <div class="mt-4">
+                                    <p class="text-sm font-medium text-gray-200">{{ $qr->name }}</p>
+                                    <img src="{{ asset($qr->value) }}" alt="{{ $qr->name }} QR Code" class="w-24 h-24 mt-2 rounded-md bg-white p-1">
+                                </div>
+                            @endforeach
+                        @endif
+                        {{-- ============================================= --}}
+                        {{-- AKHIR PERUBAHAN FOOTER (KODE QR) --}}
+                        {{-- ============================================= --}}
                     </div>
                 </div>
                 <div class="mt-10 border-t border-gray-700/50 pt-6 text-center text-gray-500 text-sm">&copy;
