@@ -93,10 +93,6 @@
                                 <div x-show="open" x-transition:enter="transition ease-out duration-100" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-75" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
                                     class="absolute left-1/2 transform -translate-x-1/2 mt-1 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-20 text-gray-700" style="display: none;">
                                     <div class="py-1" role="menu" aria-orientation="vertical">
-                                        <a href="{{ route('explore', ['locale' => app()->getLocale()]) }}"
-                                           class="dropdown-item {{ request()->routeIs('explore') && !request()->route('pageSlug') ? 'dropdown-item-active' : '' }}"
-                                           role="menuitem">{{ __('All Explore') }}</a>
-                                        <div class="border-t border-gray-100 my-1"></div>
                                         @isset($exploreCategoriesForNav)
                                             @foreach($exploreCategoriesForNav as $item)
                                                 <a href="{{ route('explore.page', ['locale' => app()->getLocale(), 'pageSlug' => $item['slug']]) }}"
@@ -127,7 +123,7 @@
                             class="flex items-center text-white hover:text-yellow-300 transition duration-300 focus:outline-none text-shadow-subtle"
                             aria-label="Change language" :aria-expanded="langOpen" aria-haspopup="true"
                             id="lang-switcher-button">
-                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2h1a2 2 0 002-2v-1a2 2 0 012-2h1.945M10 3v1m0 16v1m4-18v1m0 16v1M3 10h1m16 0h1M4 14h1m14 0h1M4 7h1m14 0h1M7 4h1m8 0h1m-9 16h1m8 0h1"></path></svg>
+                           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2h1a2 2 0 002-2v-1a2 2 0 012-2h1.945M10 3v1m0 16v1m4-18v1m0 16v1M3 10h1m16 0h1M4 14h1m14 0h1M4 7h1m14 0h1M7 4h1m8 0h1m-9 16h1m8 0h1"></path></svg>
                             <span class="ml-1 text-sm font-medium">{{ strtoupper(app()->getLocale()) }}</span>
                             <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                         </button>
@@ -198,14 +194,10 @@
                                 <svg class="w-5 h-5 transform transition-transform duration-300" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                             </button>
                             <div x-show="open" class="mt-1 space-y-1" style="display: none;">
-                                <a href="{{ route('explore', ['locale' => app()->getLocale()]) }}"
-                                   class="mobile-accordion-item {{ request()->routeIs('explore') && !request()->route('pageSlug') ? 'mobile-accordion-item-active' : '' }}">
-                                    {{ __('All Explore') }}
-                                </a>
                                 @isset($exploreCategoriesForNav)
                                     @foreach($exploreCategoriesForNav as $item)
                                         <a href="{{ route('explore.page', ['locale' => app()->getLocale(), 'pageSlug' => $item['slug']]) }}"
-                                           class="mobile-accordion-item {{ request()->routeIs('explore.page') && request()->route('pageSlug') == $item['slug'] ? 'mobile-accordion-item-active' : '' }}">
+                                            class="mobile-accordion-item {{ request()->routeIs('explore.page') && request()->route('pageSlug') == $item['slug'] ? 'mobile-accordion-item-active' : '' }}">
                                             {{ $item['name'] }}
                                         </a>
                                     @endforeach
