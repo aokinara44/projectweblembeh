@@ -1,4 +1,5 @@
 <?php
+// routes/web.php
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PageController;
@@ -10,7 +11,9 @@ use App\Http\Controllers\Admin\GalleryCategoryController;
 use App\Http\Controllers\Admin\GalleryController;
 use App\Http\Controllers\Admin\ReviewController;
 use App\Http\Controllers\Admin\UserController;
-use App\Http\Controllers\Admin\ContactController; // Pastikan ini ada
+use App\Http\Controllers\Admin\ContactController;
+use App\Http\Controllers\Admin\TransactionController;
+use App\Http\Controllers\Admin\ScheduleController; 
 use App\Http\Controllers\SitemapController;
 use App\Http\Middleware\SetLocale;
 
@@ -30,6 +33,8 @@ require __DIR__ . '/auth.php';
 Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () {
     Route::middleware(SetLocale::class)->group(function () { // Middleware SetLocale HANYA untuk panel admin
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+        
+        Route::get('/dashboard/schedule-events', [DashboardController::class, 'getScheduleEvents'])->name('dashboard.events');
 
         Route::resource('service-categories', ServiceCategoryController::class);
         Route::resource('services', ServiceController::class);
@@ -38,6 +43,19 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
         Route::resource('reviews', ReviewController::class);
         Route::resource('users', UserController::class);
         Route::resource('contacts', ContactController::class);
+
+        // --- Rute Keuangan ---
+        Route::get('transactions/print', [TransactionController::class, 'print'])->name('transactions.print');
+        
+        // <-- BARIS INI DITAMBAHKAN -->
+        Route::get('transactions/export-excel', [TransactionController::class, 'exportExcel'])->name('transactions.export.excel');
+
+        Route::resource('transactions', TransactionController::class); 
+        // ---------------------
+
+        // --- Rute Jadwal ---
+        Route::resource('schedules', ScheduleController::class); 
+        // -------------------
 
         Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
         Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -56,7 +74,7 @@ Route::get('/sitemap.xml', [SitemapController::class, 'generate'])->name('sitema
 */
 Route::prefix('{locale}')
     ->where(['locale' => '[a-zA-Z]{2}'])
-    ->middleware(SetLocale::class) // SetLocale juga digunakan di sini untuk memvalidasi {locale} dari URL
+    ->middleware(SetLocale::class) 
     ->group(function () {
 
         Route::get('/', [PageController::class, 'home'])->name('home');

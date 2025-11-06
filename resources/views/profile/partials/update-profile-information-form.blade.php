@@ -1,3 +1,6 @@
+<?php
+// resources/views/profile/partials/update-profile-information-form.blade.php
+?>
 <section>
     <header>
         <h2 class="text-lg font-medium text-gray-900">
@@ -13,7 +16,7 @@
         @csrf
     </form>
 
-    <form method="post" action="{{ route('profile.update') }}" class="mt-6 space-y-6">
+    <form method="post" action="{{ route('admin.profile.update') }}" class="mt-6 space-y-6">
         @csrf
         @method('patch')
 

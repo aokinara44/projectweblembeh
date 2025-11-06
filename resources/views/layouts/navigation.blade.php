@@ -8,7 +8,7 @@
     if (request()->routeIs('admin.service*')) $activeMenu = 'services';
     elseif (request()->routeIs('admin.gallery*')) $activeMenu = 'media';
     elseif (request()->routeIs('admin.review*')) $activeMenu = 'feedback';
-    elseif (request()->routeIs('admin.user*') || request()->routeIs('admin.profile*') || request()->routeIs('admin.contact*')) $activeMenu = 'management'; // <-- 1. DIUBAH
+    elseif (request()->routeIs('admin.user*') || request()->routeIs('admin.profile*') || request()->routeIs('admin.contact*') || request()->routeIs('admin.transaction*') || request()->routeIs('admin.schedules*')) $activeMenu = 'management'; // <-- 1. DITAMBAHKAN 'admin.schedules*'
 @endphp
 
 <div x-data="{
@@ -160,7 +160,14 @@
             </button>
             <div x-show="activeDropdown === 'management' && !sidebarMinimized" x-collapse x-cloak class="mt-1 space-y-0.5">
                 <x-nav-link class="block w-full pl-10 pr-4 py-1.5 text-sm rounded-md text-gray-500 hover:bg-gray-100 hover:text-gray-900" :href="route('admin.users.index', ['locale' => app()->getLocale()])" :active="request()->routeIs('admin.users.*')"> {{ __('Users') }} </x-nav-link>
-                <x-nav-link class="block w-full pl-10 pr-4 py-1.5 text-sm rounded-md text-gray-500 hover:bg-gray-100 hover:text-gray-900" :href="route('admin.contacts.index', ['locale' => app()->getLocale()])" :active="request()->routeIs('admin.contacts.*')"> {{ __('Contacts') }} </x-nav-link> {{-- <-- 2. DITAMBAHKAN --}}
+                <x-nav-link class="block w-full pl-10 pr-4 py-1.5 text-sm rounded-md text-gray-500 hover:bg-gray-100 hover:text-gray-900" :href="route('admin.contacts.index', ['locale' => app()->getLocale()])" :active="request()->routeIs('admin.contacts.*')"> {{ __('Contacts') }} </x-nav-link> 
+                
+                {{-- Mengambil dari kode file yang di-upload sebelumnya --}}
+                <x-nav-link class="block w-full pl-10 pr-4 py-1.5 text-sm rounded-md text-gray-500 hover:bg-gray-100 hover:text-gray-900" :href="route('admin.transactions.index', ['locale' => app()->getLocale()])" :active="request()->routeIs('admin.transactions.*')"> {{ __('Financial Report') }} </x-nav-link>
+                
+                {{-- 2. BARIS INI DITAMBAHKAN --}}
+                <x-nav-link class="block w-full pl-10 pr-4 py-1.5 text-sm rounded-md text-gray-500 hover:bg-gray-100 hover:text-gray-900" :href="route('admin.schedules.index', ['locale' => app()->getLocale()])" :active="request()->routeIs('admin.schedules.*')"> {{ __('Schedule') }} </x-nav-link>
+
                 <x-nav-link class="block w-full pl-10 pr-4 py-1.5 text-sm rounded-md text-gray-500 hover:bg-gray-100 hover:text-gray-900" :href="route('admin.profile.edit', ['locale' => app()->getLocale()])" :active="request()->routeIs('admin.profile.*')"> {{ __('My Profile') }} </x-nav-link>
             </div>
         </div>
@@ -204,7 +211,14 @@
                class="absolute w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 py-1"
                style="display: none;">
                <x-nav-link class="block w-full px-4 py-1.5 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" :href="route('admin.users.index', ['locale' => app()->getLocale()])" :active="request()->routeIs('admin.users.*')"> {{ __('Users') }} </x-nav-link>
-               <x-nav-link class="block w-full px-4 py-1.5 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" :href="route('admin.contacts.index', ['locale' => app()->getLocale()])" :active="request()->routeIs('admin.contacts.*')"> {{ __('Contacts') }} </x-nav-link> {{-- <-- 3. DITAMBAHKAN --}}
+               <x-nav-link class="block w-full px-4 py-1.5 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" :href="route('admin.contacts.index', ['locale' => app()->getLocale()])" :active="request()->routeIs('admin.contacts.*')"> {{ __('Contacts') }} </x-nav-link> 
+               
+               {{-- Mengambil dari kode file yang di-upload sebelumnya --}}
+               <x-nav-link class="block w-full px-4 py-1.5 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" :href="route('admin.transactions.index', ['locale' => app()->getLocale()])" :active="request()->routeIs('admin.transactions.*')"> {{ __('Financial Report') }} </x-nav-link>
+               
+               {{-- 3. BARIS INI DITAMBAHKAN --}}
+               <x-nav-link class="block w-full px-4 py-1.5 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" :href="route('admin.schedules.index', ['locale' => app()->getLocale()])" :active="request()->routeIs('admin.schedules.*')"> {{ __('Schedule') }} </x-nav-link>
+               
                <x-nav-link class="block w-full px-4 py-1.5 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" :href="route('admin.profile.edit', ['locale' => app()->getLocale()])" :active="request()->routeIs('admin.profile.*')"> {{ __('My Profile') }} </x-nav-link>
          </div>
     </div>
